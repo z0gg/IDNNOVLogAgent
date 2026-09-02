@@ -1,0 +1,12 @@
+#!/bin/sh
+# Locate a usable python3 on this NAS without any package dependency.
+# DSM 7.2 ships /usr/bin/python3 (3.8) in the base system; official/Community
+# Python packages follow with newer runtimes. Try system first.
+for c in /usr/bin/python3 \
+  /var/packages/Python3.9/target/usr/bin/python3 \
+  /var/packages/python311/target/usr/local/bin/python3 \
+  /var/packages/python314/target/usr/local/bin/python3; do
+  if [ -x "$c" ]; then exec "$c"; fi
+done
+echo "no python3 interpreter found" >&2
+exit 127

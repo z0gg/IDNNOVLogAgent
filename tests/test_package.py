@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 class PackageTests(unittest.TestCase):
-    SPK = Path("artifacts/IDNNOVLogAgent-1.0.4-1005-x86_64.spk")
+    SPK = Path("artifacts/IDNNOVLogAgent-1.0.5-1006-x86_64.spk")
 
     def test_info_declares_conf_folder_support_and_package_checksum(self):
         import hashlib, tarfile
@@ -42,11 +42,25 @@ class PackageTests(unittest.TestCase):
         offenders = [n for n in names if "__pycache__" in n or n.endswith(".pyc")]
         self.assertEqual(offenders, [])
 
+    def test_no_python_dependency_check(self):
+        import tarfile
+        with tarfile.open(self.SPK) as tf:
+            info = tf.extractfile("INFO").read().decode()
+        self.assertNotIn("install_dep_packages", info)
+
+    def test_python_finder_shipped_and_system_first(self):
+        import tarfile
+        with tarfile.open(self.SPK) as tf:
+            with tarfile.open(fileobj=tf.extractfile("package.tgz"), mode="r:gz") as pt:
+                members = {m.name: m for m in pt.getmembers()}
+        self.assertIn("bin/py", members)
+        self.assertEqual(oct(members["bin/py"].mode)[-3:], "755")
+
     def test_required_dsm_metadata_and_ui(self):
         self.assertTrue(self.SPK.is_file())
         with tarfile.open(self.SPK) as outer:
             info = outer.extractfile("INFO").read().decode()
-            self.assertIn('version="1.0.4-1005"', info)
+            self.assertIn('version="1.0.5-1006"', info)
             self.assertIn('os_min_ver="7.2-72806"', info)
             for arch in ("r1000", "r1000nk", "v1000", "v1000nk", "geminilake", "apollolake", "epyc7002"):
                 self.assertIn(arch, info)

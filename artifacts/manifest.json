@@ -2,12 +2,17 @@
   {
     "mode": "0o755",
     "path": "bin/api.cgi",
-    "size": 139
+    "size": 157
   },
   {
     "mode": "0o755",
     "path": "bin/fluent-bit",
     "size": 7047008
+  },
+  {
+    "mode": "0o755",
+    "path": "bin/py",
+    "size": 508
   },
   {
     "mode": "0o644",
@@ -57,7 +62,7 @@
   {
     "mode": "0o755",
     "path": "ui/api.cgi",
-    "size": 139
+    "size": 157
   },
   {
     "mode": "0o644",

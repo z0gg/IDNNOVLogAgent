@@ -1,4 +1,6 @@
 #!/bin/sh
 set -eu
-export PYTHONPATH="${SYNOPKG_PKGDEST:?}/lib"
-exec /var/packages/Python3/target/usr/local/bin/python3 -m idnnov_agent.cgi
+PKG_ROOT="/var/packages/IDNNOVLogAgent/target"
+export PYTHONPATH="$PKG_ROOT/lib"
+PY="$("$PKG_ROOT/bin/py")"
+exec "$PY" -m idnnov_agent.cgi
