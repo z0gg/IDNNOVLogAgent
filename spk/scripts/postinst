@@ -1,0 +1,16 @@
+#!/bin/sh
+set -eu
+PKG_VAR="${SYNOPKG_PKGVAR:?}"
+install -d -m 0700 "$PKG_VAR/etc" "$PKG_VAR/buffer"
+if test ! -f "$PKG_VAR/etc/settings.json"; then
+  DEVICE_ID="$(cat /proc/sys/kernel/random/uuid)"
+  COLLECTOR="${wizard_collector_url:-https://logs.idnnov.com}"
+  printf '{"collector_url":"%s","customer_id":"","device_id":"%s","endpoint":"/v1/logs","site_id":""}\n' "$COLLECTOR" "$DEVICE_ID" > "$PKG_VAR/etc/settings.json"
+  chmod 0600 "$PKG_VAR/etc/settings.json"
+fi
+if test -n "${wizard_token:-}" && test ! -f "$PKG_VAR/etc/token"; then
+  printf %s "$wizard_token" > "$PKG_VAR/etc/token"
+  chmod 0600 "$PKG_VAR/etc/token"
+fi
+export PYTHONPATH="${SYNOPKG_PKGDEST:?}/lib"
+/var/packages/Python3/target/usr/local/bin/python3 -m idnnov_agent.bootstrap

@@ -1,0 +1,6 @@
+[
+  {"step_title":"IDNNOV Log Agent","items":[
+    {"type":"textfield","desc":"URL du collecteur HTTPS (modifiable après installation)","subitems":[{"key":"wizard_collector_url","defaultValue":"https://logs.idnnov.com","validator":{"allowBlank":false,"regex":"^https://[^/\\s]+/?$"}}]},
+    {"type":"password","desc":"Token optionnel","subitems":[{"key":"wizard_token","defaultValue":"","validator":{"allowBlank":true}}]}
+  ]}
+]

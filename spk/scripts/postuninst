@@ -1,0 +1,4 @@
+#!/bin/sh
+set -eu
+# DSM owns SYNOPKG_PKGVAR retention/removal policy; no user data is erased here.
+exit 0

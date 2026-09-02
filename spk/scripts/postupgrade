@@ -1,0 +1,4 @@
+#!/bin/sh
+set -eu
+test -f "${SYNOPKG_PKGVAR:?}/etc/settings.json"
+if test -f "$SYNOPKG_PKGVAR/etc/token"; then chmod 0600 "$SYNOPKG_PKGVAR/etc/token"; fi
