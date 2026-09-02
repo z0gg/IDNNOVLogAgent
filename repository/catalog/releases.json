@@ -2,9 +2,9 @@
   "packages": [
     {
       "package": "IDNNOVLogAgent",
-      "version": "1.0.1-1002",
+      "version": "1.0.2-1003",
       "dname": "IDNNOV Log Agent",
-      "desc": "Collecte les journaux Synology et les transmet au collecteur IDNNOV.",
+      "desc": "Receives local RFC5424 syslog and forwards it to an HTTPS collector.",
       "arches": [
         "apollolake",
         "avoton",
@@ -30,10 +30,10 @@
       ],
       "min_build": 72806,
       "max_build": 89999,
-      "url": "https://github.com/z0gg/IDNNOVLogAgent/releases/download/v1.0.1-1002/IDNNOVLogAgent-1.0.1-1002-x86_64.spk",
+      "url": "https://github.com/z0gg/IDNNOVLogAgent/releases/download/v1.0.2-1003/IDNNOVLogAgent-1.0.2-1003-x86_64.spk",
       "size": 3020800,
-      "md5": "a378e63fca3844c07d4d0a1d56c71774",
-      "sha256": "506d978611b877b01bcfb5c6da1d80f4028454696d023bd419dabde04c088bfd"
+      "md5": "df963d3a35710ec7529d466b8d9d9f88",
+      "sha256": "10a140aab2aa0d78cbd1aa76be4ddc177b9f649ae8f849533aa59b7429e70957"
     }
   ]
 }

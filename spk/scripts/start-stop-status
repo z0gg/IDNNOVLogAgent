@@ -1,0 +1,3 @@
+#!/bin/sh
+# DSM 7 requires the lifecycle entrypoint even when setup is delegated.
+exec "${SYNOPKG_PKGDEST:?}/scripts/service-setup" "${1:-}"

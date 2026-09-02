@@ -3,7 +3,7 @@
 import argparse, gzip, hashlib, json, os, shutil, stat, struct, tarfile, tempfile, zlib
 from pathlib import Path
 
-ROOT=Path(__file__).resolve().parents[1]; EPOCH=int(os.environ.get("SOURCE_DATE_EPOCH","1788230400")); NAME="IDNNOVLogAgent-1.0.1-1002-x86_64.spk"
+ROOT=Path(__file__).resolve().parents[1]; EPOCH=int(os.environ.get("SOURCE_DATE_EPOCH","1788230400")); NAME="IDNNOVLogAgent-1.0.2-1003-x86_64.spk"
 def png(path,size):
     raw=b''.join(b'\0'+bytes((18,115,222,255))*size for _ in range(size))
     def chunk(kind,data): return struct.pack('>I',len(data))+kind+data+struct.pack('>I',zlib.crc32(kind+data)&0xffffffff)
@@ -27,11 +27,12 @@ def build(binary):
         stage=Path(td); payload=stage/'payload'; outer=stage/'outer'; shutil.copytree(ROOT/'pkgroot',payload); shutil.copytree(ROOT/'spk',outer)
         shutil.copytree(ROOT/'src/idnnov_agent',payload/'lib/idnnov_agent'); shutil.copy2(binary,payload/'bin/fluent-bit'); (payload/'scripts').mkdir(parents=True,exist_ok=True); shutil.copy2(ROOT/'spk/scripts/service-setup',payload/'scripts/service-setup')
         shutil.copy2(payload/'bin/api.cgi',payload/'ui/api.cgi'); png(payload/'ui/images/icon-64.png',64); png(payload/'ui/images/icon-256.png',256)
+        png(outer/'PACKAGE_ICON.PNG',64); png(outer/'PACKAGE_ICON_256.PNG',256)
         normalize(payload); normalize(outer)
         package=outer/'package.tgz'
-        with package.open('wb') as raw, gzip.GzipFile(filename='',mode='wb',fileobj=raw,mtime=EPOCH,compresslevel=9) as gz, tarfile.open(fileobj=gz,mode='w',format=tarfile.PAX_FORMAT) as tf: add_tree(tf,payload)
+        with package.open('wb') as raw, gzip.GzipFile(filename='',mode='wb',fileobj=raw,mtime=EPOCH,compresslevel=9) as gz, tarfile.open(fileobj=gz,mode='w',format=tarfile.GNU_FORMAT) as tf: add_tree(tf,payload)
         os.utime(package,(EPOCH,EPOCH)); package.chmod(0o644)
-        with artifact.open('wb') as raw, tarfile.open(fileobj=raw,mode='w',format=tarfile.PAX_FORMAT) as tf: add_tree(tf,outer)
+        with artifact.open('wb') as raw, tarfile.open(fileobj=raw,mode='w',format=tarfile.GNU_FORMAT) as tf: add_tree(tf,outer)
     digest=hashlib.sha256(artifact.read_bytes()).hexdigest(); (ROOT/'artifacts/SHA256SUMS').write_text(f"{digest}  {NAME}\n")
     with tarfile.open(artifact) as tf, tarfile.open(fileobj=tf.extractfile('package.tgz'),mode='r:gz') as pt:
         manifest=[{"path":m.name,"size":m.size,"mode":oct(m.mode)} for m in pt.getmembers() if m.isfile()]

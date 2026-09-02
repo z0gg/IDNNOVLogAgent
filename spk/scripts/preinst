@@ -1,0 +1,3 @@
+#!/bin/sh
+# No privileged pre-installation work is required.
+exit 0
