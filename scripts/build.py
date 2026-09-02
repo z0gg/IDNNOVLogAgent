@@ -3,7 +3,7 @@
 import argparse, gzip, hashlib, json, os, shutil, stat, struct, tarfile, tempfile, zlib
 from pathlib import Path
 
-ROOT=Path(__file__).resolve().parents[1]; EPOCH=int(os.environ.get("SOURCE_DATE_EPOCH","1788230400")); NAME="IDNNOVLogAgent-1.0.8-1009-x86_64.spk"
+ROOT=Path(__file__).resolve().parents[1]; EPOCH=int(os.environ.get("SOURCE_DATE_EPOCH","1788230400")); NAME="IDNNOVLogAgent-1.0.9-1010-x86_64.spk"
 def png(path,size):
     raw=b''.join(b'\0'+bytes((18,115,222,255))*size for _ in range(size))
     def chunk(kind,data): return struct.pack('>I',len(data))+kind+data+struct.pack('>I',zlib.crc32(kind+data)&0xffffffff)
