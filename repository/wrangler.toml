@@ -1,0 +1,7 @@
+name = "idnnov-package-catalogue"
+main = "src/worker.mjs"
+compatibility_date = "2026-09-01"
+workers_dev = false
+
+# Set CATALOG through the deployment environment from repository/catalog/releases.json.
+# No write route or secret is required by the Worker.
