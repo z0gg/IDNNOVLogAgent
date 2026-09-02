@@ -1,3 +1,5 @@
+import embeddedCatalog from '../catalog/releases.json' with {type:'json'};
+
 const BOUNDED=/^[A-Za-z0-9_.-]{1,32}$/;
 const BUILD_RE=/^[0-9]{1,8}$/;
 const KNOWN_ARCH=new Set(['geminilake','apollolake','broadwell','broadwellnk','bromolow','denverton','epyc7002','r1000','v1000','x86_64','armv7','aarch64']);
@@ -31,7 +33,7 @@ export default {async fetch(request,env){
   }
   if(major!==7)return json({packages:[]}); // we serve nothing to DSM 6
   let manifest;
-  try{manifest=JSON.parse(env.CATALOG)}catch{return json({error:'catalog_unavailable'},503)}
+  try{manifest=env.CATALOG?JSON.parse(env.CATALOG):embeddedCatalog}catch{return json({error:'catalog_unavailable'},503)}
   const httpsRe=/^https:\/\/github\.com\/[^/]+\/[^/]+\/releases\/download\//;
   const compatible=(manifest.packages||[])
     .filter(p=>p&&p.arch===arch&&build>=p.min_build&&build<=p.max_build&&httpsRe.test(p.url||'')&&typeof p.size==='number'&&/^[0-9a-f]{32}$/.test(p.md5||''))

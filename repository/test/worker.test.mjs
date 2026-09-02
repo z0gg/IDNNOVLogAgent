@@ -5,7 +5,7 @@ import worker from '../src/worker.mjs';
 const CATALOG_ENTRY={
   package:'IDNNOVLogAgent',version:'1.0.0-1001',dname:'IDNNOV Log Agent',
   desc:'Collecte les journaux Synology et les transmet au collecteur IDNNOV.',
-  arch:'geminilake',min_build:81180,max_build:89999,
+  arch:'geminilake',min_build:86009,max_build:89999,
   url:'https://github.com/z0gg/IDNNOVLogAgent/releases/download/v1.0.0-1001/IDNNOVLogAgent-1.0.0-1001-geminilake.spk',
   size:3020800,md5:'d4ff47141be15cd0e1b984ed10b9782f',
   sha256:'10379bf5eb07f84134fd09b546314315a64caaa312ad69bdd38efb241c4bac7b'};
@@ -18,6 +18,14 @@ test('1 GET valid DSM 7.3 geminilake returns 200 json with exactly one package',
   assert.match(r.headers.get('content-type'),/^application\/json/);
   const j=await r.json();
   assert.equal(j.packages.length,1);
+});
+
+test('1b embedded versioned catalog works without a runtime binding',async()=>{
+  const r=await worker.fetch(new Request(GET),{});
+  assert.equal(r.status,200);
+  const j=await r.json();
+  assert.equal(j.packages.length,1);
+  assert.equal(j.packages[0].version,'1.0.0-1001');
 });
 
 test('2 POST form-urlencoded equals GET response deeply',async()=>{
@@ -60,10 +68,10 @@ test('6 valid but incompatible arch returns empty packages 200',async()=>{
   assert.equal(r.status,200);
 });
 
-test('7 build below os_min_ver 81180 hides package; 81180 and above show it',async()=>{
-  const below=await (await worker.fetch(new Request('https://packages.idnnov.com/?arch=geminilake&build=81179&language=fre'),env)).json();
+test('7 build below os_min_ver 86009 hides package; 86009 and above show it',async()=>{
+  const below=await (await worker.fetch(new Request('https://packages.idnnov.com/?arch=geminilake&build=86008&language=fre'),env)).json();
   assert.deepEqual(below.packages,[]);
-  for(const b of ['81180','86003','86009']){
+  for(const b of ['86009','86100','89999']){
     const j=await (await worker.fetch(new Request(`https://packages.idnnov.com/?arch=geminilake&build=${b}&language=fre`),env)).json();
     assert.equal(j.packages.length,1,b);
   }

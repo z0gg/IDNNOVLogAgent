@@ -1,0 +1,13 @@
+{
+  "name": "idnnov-synology-package-catalogue",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/worker.test.mjs",
+    "build": "rm -rf pages-dist && mkdir -p pages-dist && esbuild src/worker.mjs --bundle --format=esm --platform=browser --target=es2022 --outfile=pages-dist/_worker.js && cp public/index.txt pages-dist/index.txt"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.9"
+  }
+}

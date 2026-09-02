@@ -6,7 +6,7 @@
       "dname": "IDNNOV Log Agent",
       "desc": "Collecte les journaux Synology et les transmet au collecteur IDNNOV.",
       "arch": "geminilake",
-      "min_build": 81180,
+      "min_build": 86009,
       "max_build": 89999,
       "url": "https://github.com/z0gg/IDNNOVLogAgent/releases/download/v1.0.0-1001/IDNNOVLogAgent-1.0.0-1001-geminilake.spk",
       "size": 3020800,

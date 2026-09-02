@@ -11,6 +11,11 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - run: PYTHONPATH=src python3 -m unittest discover -v
-      - run: node --test repository/test/worker.test.mjs
+      - run: npm ci
+        working-directory: repository
+      - run: npm test
+        working-directory: repository
+      - run: npm run build
+        working-directory: repository
       - run: python3 -m compileall -q src
       - run: if rg -n '(BEGIN (RSA|OPENSSH|EC) PRIVATE KEY|token\s*[=:]\s*[^ ]+)' --glob '!third_party/**' .; then exit 1; fi
