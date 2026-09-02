@@ -2,7 +2,7 @@
   "packages": [
     {
       "package": "IDNNOVLogAgent",
-      "version": "1.0.8-1009",
+      "version": "1.0.9-1010",
       "dname": "IDNNOV Log Agent",
       "desc": "Receives local RFC5424 syslog and forwards it to an HTTPS collector.",
       "arches": [
@@ -30,10 +30,10 @@
       ],
       "min_build": 72806,
       "max_build": 99999,
-      "url": "https://github.com/z0gg/IDNNOVLogAgent/releases/download/v1.0.8-1009/IDNNOVLogAgent-1.0.8-1009-x86_64.spk",
+      "url": "https://github.com/z0gg/IDNNOVLogAgent/releases/download/v1.0.9-1010/IDNNOVLogAgent-1.0.9-1010-x86_64.spk",
       "size": 3010560,
-      "md5": "86b87d3885e72640cbfb73b4e44ce1c8",
-      "sha256": "3072548f94d74eccf643bb285a8b534fa1874582da46d80b68d4842e0280258b"
+      "md5": "c775e74069497cf221d45c589a0df6b6",
+      "sha256": "f979835fdb65f8d539bb92f5ea0d45bf7df7e4a663686b1f8f95007bca40d56d"
     }
   ]
 }
