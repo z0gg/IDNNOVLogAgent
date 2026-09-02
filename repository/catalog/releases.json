@@ -2,16 +2,38 @@
   "packages": [
     {
       "package": "IDNNOVLogAgent",
-      "version": "1.0.0-1001",
+      "version": "1.0.1-1002",
       "dname": "IDNNOV Log Agent",
       "desc": "Collecte les journaux Synology et les transmet au collecteur IDNNOV.",
-      "arch": "geminilake",
-      "min_build": 86009,
+      "arches": [
+        "apollolake",
+        "avoton",
+        "braswell",
+        "broadwell",
+        "broadwellnk",
+        "broadwellnkv2",
+        "broadwellntbap",
+        "bromolow",
+        "cedarview",
+        "denverton",
+        "epyc7002",
+        "geminilake",
+        "geminilakenk",
+        "grantley",
+        "icelaked",
+        "kvmx64",
+        "purley",
+        "r1000",
+        "r1000nk",
+        "v1000",
+        "v1000nk"
+      ],
+      "min_build": 72806,
       "max_build": 89999,
-      "url": "https://github.com/z0gg/IDNNOVLogAgent/releases/download/v1.0.0-1001/IDNNOVLogAgent-1.0.0-1001-geminilake.spk",
+      "url": "https://github.com/z0gg/IDNNOVLogAgent/releases/download/v1.0.1-1002/IDNNOVLogAgent-1.0.1-1002-x86_64.spk",
       "size": 3020800,
-      "md5": "d4ff47141be15cd0e1b984ed10b9782f",
-      "sha256": "10379bf5eb07f84134fd09b546314315a64caaa312ad69bdd38efb241c4bac7b"
+      "md5": "a378e63fca3844c07d4d0a1d56c71774",
+      "sha256": "506d978611b877b01bcfb5c6da1d80f4028454696d023bd419dabde04c088bfd"
     }
   ]
 }

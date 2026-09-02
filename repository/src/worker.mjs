@@ -2,7 +2,7 @@ import embeddedCatalog from '../catalog/releases.json' with {type:'json'};
 
 const BOUNDED=/^[A-Za-z0-9_.-]{1,32}$/;
 const BUILD_RE=/^[0-9]{1,8}$/;
-const KNOWN_ARCH=new Set(['geminilake','apollolake','broadwell','broadwellnk','bromolow','denverton','epyc7002','r1000','v1000','x86_64','armv7','aarch64']);
+const KNOWN_ARCH=new Set(['apollolake','avoton','braswell','broadwell','broadwellnk','broadwellnkv2','broadwellntbap','bromolow','cedarview','denverton','epyc7002','geminilake','geminilakenk','grantley','icelaked','kvmx64','purley','r1000','r1000nk','v1000','v1000nk']);
 const KNOWN_LANG=new Set(['enu','fre','deu','esn','ita','jpn','krn','ptg','rus','chs','cht','nld','nor','sve','dan','plk','hun','trk','csy','brazil']);
 function json(value,status=200){return new Response(JSON.stringify(value),{status,headers:{'content-type':'application/json; charset=utf-8','cache-control':status===200?'public, max-age=300':'no-store','x-content-type-options':'nosniff','content-security-policy':"default-src 'none'"}})}
 function semverKey(p){const[v,rev]=p.version.split('-');const nums=v.split('.').map(Number);return ((nums[0]||0)*1e10)+((nums[1]||0)*1e6)+((nums[2]||0)*1e3)+Number(rev||0)}
@@ -36,7 +36,7 @@ export default {async fetch(request,env){
   try{manifest=env.CATALOG?JSON.parse(env.CATALOG):embeddedCatalog}catch{return json({error:'catalog_unavailable'},503)}
   const httpsRe=/^https:\/\/github\.com\/[^/]+\/[^/]+\/releases\/download\//;
   const compatible=(manifest.packages||[])
-    .filter(p=>p&&p.arch===arch&&build>=p.min_build&&build<=p.max_build&&httpsRe.test(p.url||'')&&typeof p.size==='number'&&/^[0-9a-f]{32}$/.test(p.md5||''))
+    .filter(p=>p&&(Array.isArray(p.arches)?p.arches.includes(arch):p.arch===arch)&&build>=p.min_build&&build<=p.max_build&&httpsRe.test(p.url||'')&&typeof p.size==='number'&&/^[0-9a-f]{32}$/.test(p.md5||''))
     .sort((a,b)=>semverKey(b)-semverKey(a));
   if(compatible.length===0)return json({packages:[]});
   const p=compatible[0];

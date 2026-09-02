@@ -3,12 +3,12 @@ import assert from 'node:assert/strict';
 import worker from '../src/worker.mjs';
 
 const CATALOG_ENTRY={
-  package:'IDNNOVLogAgent',version:'1.0.0-1001',dname:'IDNNOV Log Agent',
+  package:'IDNNOVLogAgent',version:'1.0.1-1002',dname:'IDNNOV Log Agent',
   desc:'Collecte les journaux Synology et les transmet au collecteur IDNNOV.',
-  arch:'geminilake',min_build:86009,max_build:89999,
-  url:'https://github.com/z0gg/IDNNOVLogAgent/releases/download/v1.0.0-1001/IDNNOVLogAgent-1.0.0-1001-geminilake.spk',
-  size:3020800,md5:'d4ff47141be15cd0e1b984ed10b9782f',
-  sha256:'10379bf5eb07f84134fd09b546314315a64caaa312ad69bdd38efb241c4bac7b'};
+  arches:['apollolake','geminilake','r1000','v1000','epyc7002'],min_build:72806,max_build:89999,
+  url:'https://github.com/z0gg/IDNNOVLogAgent/releases/download/v1.0.1-1002/IDNNOVLogAgent-1.0.1-1002-x86_64.spk',
+  size:3020800,md5:'a378e63fca3844c07d4d0a1d56c71774',
+  sha256:'506d978611b877b01bcfb5c6da1d80f4028454696d023bd419dabde04c088bfd'};
 const env={CATALOG:JSON.stringify({packages:[CATALOG_ENTRY]})};
 const GET='https://packages.idnnov.com/?arch=geminilake&build=86009&language=fre&major=7&minor=3&micro=1&package_update_channel=stable';
 
@@ -25,7 +25,7 @@ test('1b embedded versioned catalog works without a runtime binding',async()=>{
   assert.equal(r.status,200);
   const j=await r.json();
   assert.equal(j.packages.length,1);
-  assert.equal(j.packages[0].version,'1.0.0-1001');
+  assert.equal(j.packages[0].version,'1.0.1-1002');
 });
 
 test('2 POST form-urlencoded equals GET response deeply',async()=>{
@@ -56,8 +56,8 @@ test('5 invalid arch/build/major/language returns 422',async()=>{
   }
 });
 
-test('5b valid but unserved arch (apollolake) returns empty 200',async()=>{
-  const r=await worker.fetch(new Request('https://packages.idnnov.com/?arch=apollolake&build=86009&language=fre'),env);
+test('5b valid but unserved arch (bromolow) returns empty 200',async()=>{
+  const r=await worker.fetch(new Request('https://packages.idnnov.com/?arch=bromolow&build=86009&language=fre'),env);
   assert.equal(r.status,200);
   assert.deepEqual((await r.json()).packages,[]);
 });
@@ -68,13 +68,19 @@ test('6 valid but incompatible arch returns empty packages 200',async()=>{
   assert.equal(r.status,200);
 });
 
-test('7 build below os_min_ver 86009 hides package; 86009 and above show it',async()=>{
-  const below=await (await worker.fetch(new Request('https://packages.idnnov.com/?arch=geminilake&build=86008&language=fre'),env)).json();
+test('7 build below os_min_ver 72806 hides package; DSM 7.2.2 and above show it',async()=>{
+  const below=await (await worker.fetch(new Request('https://packages.idnnov.com/?arch=geminilake&build=72805&language=fre'),env)).json();
   assert.deepEqual(below.packages,[]);
-  for(const b of ['86009','86100','89999']){
+  for(const b of ['72806','86009','89999']){
     const j=await (await worker.fetch(new Request(`https://packages.idnnov.com/?arch=geminilake&build=${b}&language=fre`),env)).json();
     assert.equal(j.packages.length,1,b);
   }
+});
+
+test('7b AMD r1000 DS723+ DSM 7.2.2 receives the x86_64 release',async()=>{
+  const j=await (await worker.fetch(new Request('https://packages.idnnov.com/?arch=r1000&build=72806&language=fre&major=7'),env)).json();
+  assert.equal(j.packages.length,1);
+  assert.equal(j.packages[0].version,'1.0.1-1002');
 });
 
 test('8 major other than 7 returns no packages',async()=>{
@@ -112,7 +118,7 @@ test('13 multiple compatible releases yield only the newest promoted one',async(
   const two={packages:[CATALOG_ENTRY,{...CATALOG_ENTRY,version:'0.9.0-900',url:'https://github.com/z0gg/IDNNOVLogAgent/releases/download/v0.9.0-900/IDNNOVLogAgent-0.9.0-900-geminilake.spk',md5:'e'.repeat(32)}]};
   const j=await (await worker.fetch(new Request(GET),{CATALOG:JSON.stringify(two)})).json();
   assert.equal(j.packages.length,1);
-  assert.equal(j.packages[0].version,'1.0.0-1001');
+  assert.equal(j.packages[0].version,'1.0.1-1002');
 });
 
 test('14 malformed catalog or non-HTTPS URL fails closed with no partial response',async()=>{
