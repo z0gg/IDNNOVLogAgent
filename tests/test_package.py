@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 class PackageTests(unittest.TestCase):
-    SPK = Path("artifacts/IDNNOVLogAgent-1.0.7-1008-x86_64.spk")
+    SPK = Path("artifacts/IDNNOVLogAgent-1.0.8-1009-x86_64.spk")
 
     def test_info_declares_conf_folder_support_and_package_checksum(self):
         import hashlib, tarfile
@@ -86,7 +86,7 @@ class PackageTests(unittest.TestCase):
         self.assertTrue(self.SPK.is_file())
         with tarfile.open(self.SPK) as outer:
             info = outer.extractfile("INFO").read().decode()
-            self.assertIn('version="1.0.7-1008"', info)
+            self.assertIn('version="1.0.8-1009"', info)
             self.assertIn('os_min_ver="7.2-72806"', info)
             for arch in ("r1000", "r1000nk", "v1000", "v1000nk", "geminilake", "apollolake", "epyc7002"):
                 self.assertIn(arch, info)
@@ -110,3 +110,12 @@ class PackageTests(unittest.TestCase):
             privilege = json.load(outer.extractfile("conf/privilege"))
         self.assertEqual(privilege["defaults"]["run-as"], "package")
         self.assertNotIn("ctrl-script", privilege)
+
+    def test_no_resource_declarations_shipped(self):
+        # Regression for the GRLAROCHE-SRV start_failed: a string-form
+        # usr-local-linker resource ("lib": "lib") fails DSM resource
+        # acquisition at prepare_start ("Failed to acquire startup worker").
+        # The binary links only against base glibc, so no resource is needed.
+        with tarfile.open(self.SPK) as outer:
+            names = outer.getnames()
+        self.assertNotIn("conf/resource", names)
