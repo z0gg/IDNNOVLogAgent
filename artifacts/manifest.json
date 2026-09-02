@@ -1,0 +1,157 @@
+[
+  {
+    "mode": "0o755",
+    "path": "bin/api.cgi",
+    "size": 139
+  },
+  {
+    "mode": "0o755",
+    "path": "bin/fluent-bit",
+    "size": 7047008
+  },
+  {
+    "mode": "0o644",
+    "path": "lib/idnnov_agent/__init__.py",
+    "size": 40
+  },
+  {
+    "mode": "0o644",
+    "path": "lib/idnnov_agent/__pycache__/__init__.cpython-311.pyc",
+    "size": 204
+  },
+  {
+    "mode": "0o644",
+    "path": "lib/idnnov_agent/__pycache__/api.cpython-311.pyc",
+    "size": 10295
+  },
+  {
+    "mode": "0o644",
+    "path": "lib/idnnov_agent/__pycache__/bootstrap.cpython-311.pyc",
+    "size": 1549
+  },
+  {
+    "mode": "0o644",
+    "path": "lib/idnnov_agent/__pycache__/cgi.cpython-311.pyc",
+    "size": 1564
+  },
+  {
+    "mode": "0o644",
+    "path": "lib/idnnov_agent/__pycache__/config.cpython-311.pyc",
+    "size": 7539
+  },
+  {
+    "mode": "0o644",
+    "path": "lib/idnnov_agent/__pycache__/connection.cpython-311.pyc",
+    "size": 4346
+  },
+  {
+    "mode": "0o644",
+    "path": "lib/idnnov_agent/__pycache__/persistence.cpython-311.pyc",
+    "size": 4404
+  },
+  {
+    "mode": "0o644",
+    "path": "lib/idnnov_agent/__pycache__/transaction.cpython-311.pyc",
+    "size": 2435
+  },
+  {
+    "mode": "0o644",
+    "path": "lib/idnnov_agent/api.py",
+    "size": 4865
+  },
+  {
+    "mode": "0o644",
+    "path": "lib/idnnov_agent/bootstrap.py",
+    "size": 564
+  },
+  {
+    "mode": "0o644",
+    "path": "lib/idnnov_agent/cgi.py",
+    "size": 648
+  },
+  {
+    "mode": "0o644",
+    "path": "lib/idnnov_agent/config.py",
+    "size": 3750
+  },
+  {
+    "mode": "0o644",
+    "path": "lib/idnnov_agent/connection.py",
+    "size": 2070
+  },
+  {
+    "mode": "0o644",
+    "path": "lib/idnnov_agent/persistence.py",
+    "size": 1777
+  },
+  {
+    "mode": "0o644",
+    "path": "lib/idnnov_agent/transaction.py",
+    "size": 1148
+  },
+  {
+    "mode": "0o755",
+    "path": "scripts/service-setup",
+    "size": 545
+  },
+  {
+    "mode": "0o755",
+    "path": "ui/api.cgi",
+    "size": 139
+  },
+  {
+    "mode": "0o644",
+    "path": "ui/app.config",
+    "size": 240
+  },
+  {
+    "mode": "0o644",
+    "path": "ui/config.define",
+    "size": 125
+  },
+  {
+    "mode": "0o644",
+    "path": "ui/help/helptoc.conf",
+    "size": 93
+  },
+  {
+    "mode": "0o644",
+    "path": "ui/help/index.html",
+    "size": 813
+  },
+  {
+    "mode": "0o644",
+    "path": "ui/images/icon-256.png",
+    "size": 666
+  },
+  {
+    "mode": "0o644",
+    "path": "ui/images/icon-256.svg",
+    "size": 350
+  },
+  {
+    "mode": "0o644",
+    "path": "ui/images/icon-64.png",
+    "size": 158
+  },
+  {
+    "mode": "0o644",
+    "path": "ui/images/icon-64.svg",
+    "size": 348
+  },
+  {
+    "mode": "0o644",
+    "path": "ui/index.html",
+    "size": 1642
+  },
+  {
+    "mode": "0o755",
+    "path": "ui/scripts/app.js",
+    "size": 1682
+  },
+  {
+    "mode": "0o644",
+    "path": "ui/styles/app.css",
+    "size": 586
+  }
+]

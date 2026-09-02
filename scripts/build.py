@@ -25,7 +25,7 @@ def build(binary):
     artifact=ROOT/'artifacts'/NAME; artifact.parent.mkdir(exist_ok=True)
     with tempfile.TemporaryDirectory(prefix='idnnov-spk-') as td:
         stage=Path(td); payload=stage/'payload'; outer=stage/'outer'; shutil.copytree(ROOT/'pkgroot',payload); shutil.copytree(ROOT/'spk',outer)
-        shutil.copytree(ROOT/'src/idnnov_agent',payload/'lib/idnnov_agent'); shutil.copy2(binary,payload/'bin/fluent-bit'); shutil.copy2(ROOT/'spk/scripts/service-setup',payload/'scripts/service-setup')
+        shutil.copytree(ROOT/'src/idnnov_agent',payload/'lib/idnnov_agent'); shutil.copy2(binary,payload/'bin/fluent-bit'); (payload/'scripts').mkdir(parents=True,exist_ok=True); shutil.copy2(ROOT/'spk/scripts/service-setup',payload/'scripts/service-setup')
         shutil.copy2(payload/'bin/api.cgi',payload/'ui/api.cgi'); png(payload/'ui/images/icon-64.png',64); png(payload/'ui/images/icon-256.png',256)
         normalize(payload); normalize(outer)
         package=outer/'package.tgz'
