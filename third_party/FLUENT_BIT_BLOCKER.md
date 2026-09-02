@@ -2,7 +2,7 @@
 
 The repository packages Fluent Bit v5.0.9 as an x86-64-baseline executable with dynamic dependencies limited to `libc`, `libm`, and the standard loader. Its newest required glibc symbol is 2.34; official DSM 7.2-72806 x86_64 toolchains use glibc 2.36.
 
-Release `1.0.1-1002` is a public validation candidate for these Synology package platforms:
+Release `1.0.7-1008` is a public validation candidate for these Synology package platforms:
 
 `apollolake avoton braswell broadwell broadwellnk broadwellnkv2 broadwellntbap bromolow cedarview denverton epyc7002 geminilake geminilakenk grantley icelaked kvmx64 purley r1000 r1000nk v1000 v1000nk`
 

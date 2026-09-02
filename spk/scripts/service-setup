@@ -3,11 +3,19 @@ set -eu
 PKG_ROOT="${SYNOPKG_PKGDEST:?}"
 PKG_VAR="${SYNOPKG_PKGVAR:?}"
 FB_PID="$PKG_VAR/fluent-bit.pid"
+FB_LOG="$PKG_VAR/fluent-bit.log"
 case "${1:-}" in
   start)
     test -x "$PKG_ROOT/bin/fluent-bit" || exit 1
-    "$PKG_ROOT/bin/fluent-bit" -c "$PKG_VAR/etc/fluent-bit.conf" >/dev/null 2>&1 &
+    test -r "$PKG_VAR/etc/fluent-bit.conf" || exit 1
+    if test -r "$FB_PID" && kill -0 "$(sed -n '1p' "$FB_PID")" 2>/dev/null; then exit 0; fi
+    rm -f "$FB_PID"
+    if test -f "$FB_LOG" && test "$(wc -c < "$FB_LOG")" -gt 1048576; then mv -f "$FB_LOG" "$FB_LOG.1"; fi
+    printf '\n=== IDNNOV Log Agent start %s ===\n' "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" >> "$FB_LOG"
+    "$PKG_ROOT/bin/fluent-bit" -c "$PKG_VAR/etc/fluent-bit.conf" >> "$FB_LOG" 2>&1 &
     printf '%s\n' "$!" > "$FB_PID"
+    sleep 2
+    if ! kill -0 "$(sed -n '1p' "$FB_PID")" 2>/dev/null; then rm -f "$FB_PID"; exit 1; fi
     ;;
   stop)
     if test -r "$FB_PID"; then kill "$(sed -n '1p' "$FB_PID")" 2>/dev/null || true; fi
@@ -15,6 +23,9 @@ case "${1:-}" in
     ;;
   status)
     test -r "$FB_PID" && kill -0 "$(sed -n '1p' "$FB_PID")" 2>/dev/null
+    ;;
+  log)
+    test -r "$FB_LOG" && tail -n 100 "$FB_LOG"
     ;;
   *) exit 64 ;;
 esac

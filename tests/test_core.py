@@ -36,13 +36,14 @@ class UrlTests(unittest.TestCase):
 class FluentConfigTests(unittest.TestCase):
     def test_generation_is_deterministic_and_safe(self):
         settings = {"collector_url":"https://logs.example.com", "endpoint":"/v1/logs", "customer_id":"a\nb", "site_id":"s", "device_id":"d"}
-        first = config.render_fluent_bit(settings, "/run/token", "/var/buffer")
-        second = config.render_fluent_bit(dict(reversed(list(settings.items()))), "/run/token", "/var/buffer")
+        first = config.render_fluent_bit(settings, "/run/token", "/var/buffer", "/opt/idnnov/parsers.conf")
+        second = config.render_fluent_bit(dict(reversed(list(settings.items()))), "/run/token", "/var/buffer", "/opt/idnnov/parsers.conf")
         self.assertEqual(first, second)
         self.assertIn("Listen 127.0.0.1", first)
         self.assertIn("Port 5514", first)
         self.assertIn("tls.verify On", first)
         self.assertIn("storage.total_limit_size 128M", first)
+        self.assertIn("Parsers_File /opt/idnnov/parsers.conf", first)
         self.assertNotIn("a\nb", first)
 
 

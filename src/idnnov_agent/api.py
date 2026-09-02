@@ -34,7 +34,7 @@ def get_status():
         pid = int(pid_file.read_text().strip()); os.kill(pid, 0); running = True
     except (OSError, ValueError): pass
     buffer_bytes = sum(p.stat().st_size for p in (pkgvar / "buffer").glob("**/*") if p.is_file()) if (pkgvar / "buffer").exists() else 0
-    return {"running":running,"package_version":"1.0.0-1001","fluent_bit_version":"5.0.9","destination":persistence.load_public(ETC)["collector_url"],"listener":"127.0.0.1:5514","buffer_bytes":buffer_bytes,"buffer_limit_bytes":134217728}
+    return {"running":running,"package_version":"1.0.7-1008","fluent_bit_version":"5.0.9","destination":persistence.load_public(ETC)["collector_url"],"listener":"127.0.0.1:5514","buffer_bytes":buffer_bytes,"buffer_limit_bytes":134217728}
 
 def _service(action):
     script = Path(os.environ.get("SYNOPKG_PKGDEST", "/var/packages/IDNNOVLogAgent/target")) / "scripts/service-setup"
@@ -44,8 +44,9 @@ def save_settings(settings, token_action, token=None):
     existing_token = (ETC / "token").read_text() if (ETC / "token").is_file() else None
     effective = token if token_action == "replace" else (None if token_action == "delete" else existing_token)
     clean = persistence.migrate(settings)
-    rendered = config.render_fluent_bit(clean, effective, str(ETC.parent / "buffer"))
-    binary = Path(os.environ.get("SYNOPKG_PKGDEST", "/var/packages/IDNNOVLogAgent/target")) / "bin/fluent-bit"
+    pkgdest = Path(os.environ.get("SYNOPKG_PKGDEST", "/var/packages/IDNNOVLogAgent/target"))
+    rendered = config.render_fluent_bit(clean, effective, str(ETC.parent / "buffer"), str(pkgdest / "etc/parsers.conf"))
+    binary = pkgdest / "bin/fluent-bit"
     current = ETC / "fluent-bit.conf"
     def valid(path):
         return subprocess.run([str(binary), "--dry-run", "-c", str(path)], timeout=15, check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode == 0

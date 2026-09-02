@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 class PackageTests(unittest.TestCase):
-    SPK = Path("artifacts/IDNNOVLogAgent-1.0.6-1007-x86_64.spk")
+    SPK = Path("artifacts/IDNNOVLogAgent-1.0.7-1008-x86_64.spk")
 
     def test_info_declares_conf_folder_support_and_package_checksum(self):
         import hashlib, tarfile
@@ -72,11 +72,21 @@ class PackageTests(unittest.TestCase):
             self.assertNotIn('PY="$(' , script)
             self.assertIn('/bin/py" -m idnnov_agent.', script)
 
+    def test_parser_config_and_persistent_service_log_are_shipped(self):
+        import tarfile
+        with tarfile.open(self.SPK) as tf:
+            service = tf.extractfile("scripts/service-setup").read().decode()
+            with tarfile.open(fileobj=tf.extractfile("package.tgz"), mode="r:gz") as pt:
+                parser = pt.extractfile("etc/parsers.conf").read().decode()
+        self.assertIn("Name        syslog-rfc5424", parser)
+        self.assertIn('fluent-bit.log', service)
+        self.assertNotIn('>/dev/null 2>&1', service)
+
     def test_required_dsm_metadata_and_ui(self):
         self.assertTrue(self.SPK.is_file())
         with tarfile.open(self.SPK) as outer:
             info = outer.extractfile("INFO").read().decode()
-            self.assertIn('version="1.0.6-1007"', info)
+            self.assertIn('version="1.0.7-1008"', info)
             self.assertIn('os_min_ver="7.2-72806"', info)
             for arch in ("r1000", "r1000nk", "v1000", "v1000nk", "geminilake", "apollolake", "epyc7002"):
                 self.assertIn(arch, info)

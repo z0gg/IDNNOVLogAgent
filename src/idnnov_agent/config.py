@@ -61,7 +61,7 @@ def _safe_label(value):
         raise ValueError("invalid label")
     return re.sub(r"[^A-Za-z0-9_.:@/-]", "_", value)
 
-def render_fluent_bit(settings, token, storage_path):
+def render_fluent_bit(settings, token, storage_path, parsers_file):
     origin = urlsplit(validate_collector(settings["collector_url"]))
     endpoint = validate_endpoint(settings["endpoint"])
     port = origin.port or 443
@@ -73,4 +73,4 @@ def render_fluent_bit(settings, token, storage_path):
     if token:
         if not isinstance(token, str) or len(token) > 8192 or any(c.isspace() or ord(c) < 33 or ord(c) > 126 for c in token): raise ValueError("invalid token")
         auth = f"    Header Authorization Bearer {token}\n"
-    return f"""[SERVICE]\n    Flush 5\n    Log_Level info\n    storage.path {storage_path}\n    storage.sync normal\n    storage.checksum on\n\n[INPUT]\n    Name syslog\n    Mode tcp\n    Listen 127.0.0.1\n    Port 5514\n    Parser syslog-rfc5424\n    storage.type filesystem\n\n[OUTPUT]\n    Name http\n    Match *\n    Host {host}\n    Port {port}\n    URI {endpoint}\n    Format json_lines\n    tls On\n    tls.verify On\n{auth}    Header X-IDNNOV-Customer {customer}\n    Header X-IDNNOV-Site {site}\n    Header X-IDNNOV-Device {device}\n    storage.total_limit_size 128M\n"""
+    return f"""[SERVICE]\n    Flush 5\n    Log_Level info\n    Parsers_File {parsers_file}\n    storage.path {storage_path}\n    storage.sync normal\n    storage.checksum on\n\n[INPUT]\n    Name syslog\n    Mode tcp\n    Listen 127.0.0.1\n    Port 5514\n    Parser syslog-rfc5424\n    storage.type filesystem\n\n[OUTPUT]\n    Name http\n    Match *\n    Host {host}\n    Port {port}\n    URI {endpoint}\n    Format json_lines\n    tls On\n    tls.verify On\n{auth}    Header X-IDNNOV-Customer {customer}\n    Header X-IDNNOV-Site {site}\n    Header X-IDNNOV-Device {device}\n    storage.total_limit_size 128M\n"""

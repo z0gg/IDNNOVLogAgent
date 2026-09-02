@@ -16,18 +16,23 @@
   },
   {
     "mode": "0o644",
+    "path": "etc/parsers.conf",
+    "size": 304
+  },
+  {
+    "mode": "0o644",
     "path": "lib/idnnov_agent/__init__.py",
     "size": 40
   },
   {
     "mode": "0o644",
     "path": "lib/idnnov_agent/api.py",
-    "size": 4865
+    "size": 4922
   },
   {
     "mode": "0o644",
     "path": "lib/idnnov_agent/bootstrap.py",
-    "size": 564
+    "size": 633
   },
   {
     "mode": "0o644",
@@ -37,7 +42,7 @@
   {
     "mode": "0o644",
     "path": "lib/idnnov_agent/config.py",
-    "size": 3750
+    "size": 3797
   },
   {
     "mode": "0o644",
@@ -57,7 +62,7 @@
   {
     "mode": "0o755",
     "path": "scripts/service-setup",
-    "size": 545
+    "size": 1113
   },
   {
     "mode": "0o755",
