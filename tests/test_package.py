@@ -5,13 +5,30 @@ from pathlib import Path
 
 
 class PackageTests(unittest.TestCase):
-    SPK = Path("artifacts/IDNNOVLogAgent-1.0.2-1003-x86_64.spk")
+    SPK = Path("artifacts/IDNNOVLogAgent-1.0.3-1004-x86_64.spk")
+
+    def test_info_declares_conf_folder_support_and_package_checksum(self):
+        import hashlib, tarfile
+        with tarfile.open(self.SPK) as tf:
+            info = tf.extractfile("INFO").read().decode()
+            pkg = tf.extractfile("package.tgz").read()
+        self.assertIn('support_conf_folder="yes"', info)
+        md5 = hashlib.md5(pkg).hexdigest()
+        self.assertIn(f'checksum="{md5}"', info)
+
+    def test_no_pycache_in_payload(self):
+        import tarfile
+        with tarfile.open(self.SPK) as tf:
+            with tarfile.open(fileobj=tf.extractfile("package.tgz"), mode="r:gz") as pt:
+                names = pt.getnames()
+        offenders = [n for n in names if "__pycache__" in n or n.endswith(".pyc")]
+        self.assertEqual(offenders, [])
 
     def test_required_dsm_metadata_and_ui(self):
         self.assertTrue(self.SPK.is_file())
         with tarfile.open(self.SPK) as outer:
             info = outer.extractfile("INFO").read().decode()
-            self.assertIn('version="1.0.2-1003"', info)
+            self.assertIn('version="1.0.3-1004"', info)
             self.assertIn('os_min_ver="7.2-72806"', info)
             for arch in ("r1000", "r1000nk", "v1000", "v1000nk", "geminilake", "apollolake", "epyc7002"):
                 self.assertIn(arch, info)

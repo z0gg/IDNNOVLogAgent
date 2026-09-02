@@ -16,46 +16,6 @@
   },
   {
     "mode": "0o644",
-    "path": "lib/idnnov_agent/__pycache__/__init__.cpython-311.pyc",
-    "size": 204
-  },
-  {
-    "mode": "0o644",
-    "path": "lib/idnnov_agent/__pycache__/api.cpython-311.pyc",
-    "size": 10295
-  },
-  {
-    "mode": "0o644",
-    "path": "lib/idnnov_agent/__pycache__/bootstrap.cpython-311.pyc",
-    "size": 1549
-  },
-  {
-    "mode": "0o644",
-    "path": "lib/idnnov_agent/__pycache__/cgi.cpython-311.pyc",
-    "size": 1564
-  },
-  {
-    "mode": "0o644",
-    "path": "lib/idnnov_agent/__pycache__/config.cpython-311.pyc",
-    "size": 7539
-  },
-  {
-    "mode": "0o644",
-    "path": "lib/idnnov_agent/__pycache__/connection.cpython-311.pyc",
-    "size": 4346
-  },
-  {
-    "mode": "0o644",
-    "path": "lib/idnnov_agent/__pycache__/persistence.cpython-311.pyc",
-    "size": 4404
-  },
-  {
-    "mode": "0o644",
-    "path": "lib/idnnov_agent/__pycache__/transaction.cpython-311.pyc",
-    "size": 2435
-  },
-  {
-    "mode": "0o644",
     "path": "lib/idnnov_agent/api.py",
     "size": 4865
   },
