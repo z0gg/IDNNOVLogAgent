@@ -13,5 +13,4 @@ if test -n "${wizard_token:-}" && test ! -f "$PKG_VAR/etc/token"; then
   chmod 0600 "$PKG_VAR/etc/token"
 fi
 export PYTHONPATH="${SYNOPKG_PKGDEST:?}/lib"
-PY="$("${SYNOPKG_PKGDEST:?}/bin/py")"
-"$PY" -m idnnov_agent.bootstrap
+"${SYNOPKG_PKGDEST:?}/bin/py" -m idnnov_agent.bootstrap

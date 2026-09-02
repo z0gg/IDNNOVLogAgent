@@ -2,7 +2,7 @@
   {
     "mode": "0o755",
     "path": "bin/api.cgi",
-    "size": 157
+    "size": 143
   },
   {
     "mode": "0o755",
@@ -12,7 +12,7 @@
   {
     "mode": "0o755",
     "path": "bin/py",
-    "size": 508
+    "size": 778
   },
   {
     "mode": "0o644",
@@ -62,7 +62,7 @@
   {
     "mode": "0o755",
     "path": "ui/api.cgi",
-    "size": 157
+    "size": 143
   },
   {
     "mode": "0o644",
