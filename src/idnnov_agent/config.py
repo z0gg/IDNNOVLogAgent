@@ -6,7 +6,8 @@ from urllib.parse import urlsplit, urlunsplit
 
 DEFAULT_COLLECTOR = "https://logs.idnnov.com"
 DEFAULT_ORGANIZATION = "default"
-DEFAULT_STREAM = "synology_logs"
+# Matches the stream shown by OpenObserve's generated Fluent Bit snippet.
+DEFAULT_STREAM = "default"
 STREAM_IDENTIFIER = re.compile(r"^[a-z0-9][a-z0-9_-]{0,127}$")
 # OpenObserve organization IDs are opaque, case-sensitive strings. Example:
 # 3IpSzrDn5K5UpPiprhpEXsmj3bR. Never normalize their case.
@@ -148,4 +149,4 @@ def render_fluent_bit(settings, password, storage_path, parsers_file):
     elif clean["ingest_user"]:
         raise ValueError("ingestion password required")
     company = clean["company_name"] or clean["organization"]
-    return f"""[SERVICE]\n    Flush 5\n    Log_Level info\n    Parsers_File {parsers_file}\n    storage.path {storage_path}\n    storage.sync normal\n    storage.checksum on\n\n[INPUT]\n    Name syslog\n    Mode tcp\n    Listen 127.0.0.1\n    Port 5514\n    # DSM Log Center uses RFC 6587 octet-counting framing over TCP.\n    Format octet_counting\n    Parser syslog-rfc5424\n    storage.type filesystem\n\n[FILTER]\n    Name record_modifier\n    Match *\n    Record idnnov_company {company}\n    Record idnnov_nas {clean['nas_name']}\n    Record idnnov_device_id {clean['device_id']}\n\n[OUTPUT]\n    Name http\n    Match *\n    Host {origin.hostname}\n    Port {port}\n    URI {openobserve_endpoint(clean['organization'], clean['stream'])}\n    Format json\n    Json_date_key _timestamp\n    Json_date_format iso8601\n    tls On\n    tls.verify On\n{auth}    storage.total_limit_size 128M\n"""
+    return f"""[SERVICE]\n    Flush 5\n    Log_Level info\n    Parsers_File {parsers_file}\n    storage.path {storage_path}\n    storage.sync normal\n    storage.checksum on\n\n[INPUT]\n    Name syslog\n    Mode tcp\n    Listen 127.0.0.1\n    Port 5514\n    # DSM Log Center uses RFC 6587 octet-counting framing over TCP.\n    Format octet_counting\n    Parser syslog-rfc5424\n    storage.type filesystem\n\n[FILTER]\n    Name record_modifier\n    Match *\n    Record idnnov_company {company}\n    Record idnnov_nas {clean['nas_name']}\n    Record idnnov_device_id {clean['device_id']}\n\n[OUTPUT]\n    Name http\n    Match *\n    Host {origin.hostname}\n    Port {port}\n    URI {openobserve_endpoint(clean['organization'], clean['stream'])}\n    Format json\n    Json_date_key _timestamp\n    Json_date_format iso8601\n    tls On\n    tls.verify On\n    compress gzip\n{auth}    storage.total_limit_size 128M\n"""

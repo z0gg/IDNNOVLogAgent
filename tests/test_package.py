@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 class PackageTests(unittest.TestCase):
-    SPK = Path("artifacts/IDNNOVLogAgent-1.1.1-1014-x86_64.spk")
+    SPK = Path("artifacts/IDNNOVLogAgent-1.1.2-1015-x86_64.spk")
 
     def test_info_declares_conf_folder_support_and_package_checksum(self):
         import hashlib, tarfile
@@ -87,7 +87,7 @@ class PackageTests(unittest.TestCase):
         self.assertTrue(self.SPK.is_file())
         with tarfile.open(self.SPK) as outer:
             info = outer.extractfile("INFO").read().decode()
-            self.assertIn('version="1.1.1-1014"', info)
+            self.assertIn('version="1.1.2-1015"', info)
             self.assertIn('os_min_ver="7.2-72806"', info)
             for arch in ("r1000", "r1000nk", "v1000", "v1000nk", "geminilake", "apollolake", "epyc7002"):
                 self.assertIn(arch, info)

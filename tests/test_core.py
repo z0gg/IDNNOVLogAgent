@@ -45,7 +45,7 @@ class FluentConfigTests(unittest.TestCase):
         first = config.render_fluent_bit(self.settings(), password, "/var/buffer", "/opt/idnnov/parsers.conf")
         second = config.render_fluent_bit(dict(reversed(list(self.settings().items()))), password, "/var/buffer", "/opt/idnnov/parsers.conf")
         self.assertEqual(first, second)
-        for expected in ("Listen 127.0.0.1", "Port 5514", "Format octet_counting", "tls.verify On", "storage.total_limit_size 128M", "Parsers_File /opt/idnnov/parsers.conf", "URI /api/3IpSzrDn5K5UpPiprhpEXsmj3bR/synology_logs/_json", "Format json", "HTTP_User nas-ingest", "HTTP_Passwd 0123456789abcdef", "Record idnnov_company Laroche", "Record idnnov_nas GRLAROCHE-SRV", "Record idnnov_device_id stable-device"):
+        for expected in ("Listen 127.0.0.1", "Port 5514", "Format octet_counting", "tls.verify On", "compress gzip", "storage.total_limit_size 128M", "Parsers_File /opt/idnnov/parsers.conf", "URI /api/3IpSzrDn5K5UpPiprhpEXsmj3bR/synology_logs/_json", "Format json", "HTTP_User nas-ingest", "HTTP_Passwd 0123456789abcdef", "Record idnnov_company Laroche", "Record idnnov_nas GRLAROCHE-SRV", "Record idnnov_device_id stable-device"):
             self.assertIn(expected, first)
 
     def test_invalid_labels_cannot_inject_fluent_bit_directives(self):
@@ -92,7 +92,7 @@ class PersistenceTests(unittest.TestCase):
         self.assertEqual(migrated["device_id"], "stable")
         self.assertEqual(migrated["organization"], "Laroche")
         self.assertEqual(migrated["nas_name"], "GRLAROCHE-SRV")
-        self.assertEqual(migrated["stream"], "synology_logs")
+        self.assertEqual(migrated["stream"], "default")
     def test_legacy_bearer_token_is_not_advertised_as_basic_password(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
