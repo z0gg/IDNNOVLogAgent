@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 from . import config
 
-ALLOWED = {"collector_url", "organization", "stream", "nas_name", "device_id", "ingest_user"}
+ALLOWED = {"collector_url", "organization", "company_name", "stream", "nas_name", "device_id", "ingest_user"}
 
 
 def migrate(value):
@@ -16,6 +16,7 @@ def migrate(value):
     legacy_nas = value.get("site_id", "")
     if legacy_org:
         out["organization"] = legacy_org
+        out["company_name"] = legacy_org
     if legacy_nas:
         out["nas_name"] = legacy_nas
     for key, item in value.items():

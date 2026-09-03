@@ -26,24 +26,26 @@ class UrlTests(unittest.TestCase):
             with self.subTest(address=address), self.assertRaises(ValueError):
                 config.validate_resolved_addresses([address])
 
-    def test_validates_openobserve_identifiers(self):
-        self.assertEqual(config.validate_identifier("LaRoche"), "laroche")
-        self.assertEqual(config.openobserve_endpoint("laroche", "synology_logs"), "/api/laroche/synology_logs/_json")
+    def test_validates_case_sensitive_openobserve_organization_id_and_stream(self):
+        organization = "3IpSzrDn5K5UpPiprhpEXsmj3bR"
+        self.assertEqual(config.validate_organization_identifier(organization), organization)
+        self.assertEqual(config.validate_stream_identifier("Synology_Logs"), "synology_logs")
+        self.assertEqual(config.openobserve_endpoint(organization, "synology_logs"), f"/api/{organization}/synology_logs/_json")
         for value in ["", "two words", "../../admin", "name\nHeader"]:
             with self.subTest(value=value), self.assertRaises(ValueError):
-                config.validate_identifier(value)
+                config.validate_organization_identifier(value)
 
 
 class FluentConfigTests(unittest.TestCase):
     def settings(self):
-        return {"collector_url":"https://logs.example.com", "organization":"laroche", "stream":"synology_logs", "nas_name":"GRLAROCHE-SRV", "device_id":"stable-device", "ingest_user":"nas-ingest"}
+        return {"collector_url":"https://logs.example.com", "organization":"3IpSzrDn5K5UpPiprhpEXsmj3bR", "company_name":"Laroche", "stream":"synology_logs", "nas_name":"GRLAROCHE-SRV", "device_id":"stable-device", "ingest_user":"nas-ingest"}
 
     def test_generation_is_deterministic_and_openobserve_native(self):
         password = "0123456789abcdef"
         first = config.render_fluent_bit(self.settings(), password, "/var/buffer", "/opt/idnnov/parsers.conf")
         second = config.render_fluent_bit(dict(reversed(list(self.settings().items()))), password, "/var/buffer", "/opt/idnnov/parsers.conf")
         self.assertEqual(first, second)
-        for expected in ("Listen 127.0.0.1", "Port 5514", "Format octet_counting", "tls.verify On", "storage.total_limit_size 128M", "Parsers_File /opt/idnnov/parsers.conf", "URI /api/laroche/synology_logs/_json", "Format json", "HTTP_User nas-ingest", "HTTP_Passwd 0123456789abcdef", "Record idnnov_company laroche", "Record idnnov_nas GRLAROCHE-SRV", "Record idnnov_device_id stable-device"):
+        for expected in ("Listen 127.0.0.1", "Port 5514", "Format octet_counting", "tls.verify On", "storage.total_limit_size 128M", "Parsers_File /opt/idnnov/parsers.conf", "URI /api/3IpSzrDn5K5UpPiprhpEXsmj3bR/synology_logs/_json", "Format json", "HTTP_User nas-ingest", "HTTP_Passwd 0123456789abcdef", "Record idnnov_company Laroche", "Record idnnov_nas GRLAROCHE-SRV", "Record idnnov_device_id stable-device"):
             self.assertIn(expected, first)
 
     def test_invalid_labels_cannot_inject_fluent_bit_directives(self):

@@ -42,7 +42,7 @@
   {
     "mode": "0o644",
     "path": "lib/idnnov_agent/config.py",
-    "size": 5438
+    "size": 6397
   },
   {
     "mode": "0o644",
@@ -52,7 +52,7 @@
   {
     "mode": "0o644",
     "path": "lib/idnnov_agent/persistence.py",
-    "size": 2749
+    "size": 2806
   },
   {
     "mode": "0o644",
@@ -112,12 +112,12 @@
   {
     "mode": "0o644",
     "path": "ui/index.html",
-    "size": 2422
+    "size": 2701
   },
   {
     "mode": "0o755",
     "path": "ui/scripts/app.js",
-    "size": 1958
+    "size": 2024
   },
   {
     "mode": "0o644",

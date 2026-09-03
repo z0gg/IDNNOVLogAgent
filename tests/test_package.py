@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 class PackageTests(unittest.TestCase):
-    SPK = Path("artifacts/IDNNOVLogAgent-1.1.0-1013-x86_64.spk")
+    SPK = Path("artifacts/IDNNOVLogAgent-1.1.1-1014-x86_64.spk")
 
     def test_info_declares_conf_folder_support_and_package_checksum(self):
         import hashlib, tarfile
@@ -87,7 +87,7 @@ class PackageTests(unittest.TestCase):
         self.assertTrue(self.SPK.is_file())
         with tarfile.open(self.SPK) as outer:
             info = outer.extractfile("INFO").read().decode()
-            self.assertIn('version="1.1.0-1013"', info)
+            self.assertIn('version="1.1.1-1014"', info)
             self.assertIn('os_min_ver="7.2-72806"', info)
             for arch in ("r1000", "r1000nk", "v1000", "v1000nk", "geminilake", "apollolake", "epyc7002"):
                 self.assertIn(arch, info)
@@ -135,7 +135,7 @@ class PackageTests(unittest.TestCase):
     def test_generated_input_uses_dsm_rfc6587_octet_counting(self):
         from idnnov_agent.config import render_fluent_bit
         rendered = render_fluent_bit(
-            {"collector_url": "https://logs.idnnov.com", "organization": "laroche",
+            {"collector_url": "https://logs.idnnov.com", "organization": "3IpSzrDn5K5UpPiprhpEXsmj3bR", "company_name": "Laroche",
              "stream": "synology_logs", "nas_name": "test-nas", "device_id": "test-device", "ingest_user": ""},
             None, "/tmp/storage", "/tmp/parsers.conf")
         self.assertIn("Mode tcp", rendered)

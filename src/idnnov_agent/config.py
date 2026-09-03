@@ -7,7 +7,10 @@ from urllib.parse import urlsplit, urlunsplit
 DEFAULT_COLLECTOR = "https://logs.idnnov.com"
 DEFAULT_ORGANIZATION = "default"
 DEFAULT_STREAM = "synology_logs"
-IDENTIFIER = re.compile(r"^[a-z0-9][a-z0-9_-]{0,127}$")
+STREAM_IDENTIFIER = re.compile(r"^[a-z0-9][a-z0-9_-]{0,127}$")
+# OpenObserve organization IDs are opaque, case-sensitive strings. Example:
+# 3IpSzrDn5K5UpPiprhpEXsmj3bR. Never normalize their case.
+ORGANIZATION_IDENTIFIER = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$")
 INGEST_USER = re.compile(r"^[A-Za-z0-9_.@+-]{1,256}$")
 SECRET = re.compile(r"^[A-Za-z0-9_-]{16,512}$")
 
@@ -23,6 +26,7 @@ def defaults(device_id):
     return {
         "collector_url": DEFAULT_COLLECTOR,
         "organization": DEFAULT_ORGANIZATION,
+        "company_name": "",
         "stream": DEFAULT_STREAM,
         "nas_name": _default_nas_name(),
         "device_id": device_id,
@@ -69,13 +73,27 @@ def validate_resolved_addresses(addresses):
     return True
 
 
-def validate_identifier(value):
+def validate_stream_identifier(value):
     if not isinstance(value, str):
-        raise ValueError("invalid OpenObserve identifier")
+        raise ValueError("invalid OpenObserve stream identifier")
     normalized = value.strip().lower()
-    if not IDENTIFIER.fullmatch(normalized):
-        raise ValueError("invalid OpenObserve identifier")
+    if not STREAM_IDENTIFIER.fullmatch(normalized):
+        raise ValueError("invalid OpenObserve stream identifier")
     return normalized
+
+
+def validate_organization_identifier(value):
+    if not isinstance(value, str):
+        raise ValueError("invalid OpenObserve organization identifier")
+    normalized = value.strip()
+    if not ORGANIZATION_IDENTIFIER.fullmatch(normalized):
+        raise ValueError("invalid OpenObserve organization identifier")
+    return normalized
+
+
+def validate_identifier(value):
+    """Compatibility alias for existing callers that validate stream names."""
+    return validate_stream_identifier(value)
 
 
 def _safe_label(value):
@@ -102,14 +120,15 @@ def validate_ingest_password(value):
 
 
 def openobserve_endpoint(organization, stream):
-    return f"/api/{validate_identifier(organization)}/{validate_identifier(stream)}/_json"
+    return f"/api/{validate_organization_identifier(organization)}/{validate_stream_identifier(stream)}/_json"
 
 
 def validate_settings(settings):
     clean = dict(settings)
     clean["collector_url"] = validate_collector(clean["collector_url"])
-    clean["organization"] = validate_identifier(clean["organization"])
-    clean["stream"] = validate_identifier(clean["stream"])
+    clean["organization"] = validate_organization_identifier(clean["organization"])
+    clean["company_name"] = _safe_label(clean["company_name"]) if clean["company_name"].strip() else ""
+    clean["stream"] = validate_stream_identifier(clean["stream"])
     clean["nas_name"] = _safe_label(clean["nas_name"])
     clean["device_id"] = _safe_label(clean["device_id"])
     clean["ingest_user"] = validate_ingest_user(clean["ingest_user"])
@@ -128,4 +147,5 @@ def render_fluent_bit(settings, password, storage_path, parsers_file):
         auth = f"    HTTP_User {clean['ingest_user']}\n    HTTP_Passwd {password}\n"
     elif clean["ingest_user"]:
         raise ValueError("ingestion password required")
-    return f"""[SERVICE]\n    Flush 5\n    Log_Level info\n    Parsers_File {parsers_file}\n    storage.path {storage_path}\n    storage.sync normal\n    storage.checksum on\n\n[INPUT]\n    Name syslog\n    Mode tcp\n    Listen 127.0.0.1\n    Port 5514\n    # DSM Log Center uses RFC 6587 octet-counting framing over TCP.\n    Format octet_counting\n    Parser syslog-rfc5424\n    storage.type filesystem\n\n[FILTER]\n    Name record_modifier\n    Match *\n    Record idnnov_company {clean['organization']}\n    Record idnnov_nas {clean['nas_name']}\n    Record idnnov_device_id {clean['device_id']}\n\n[OUTPUT]\n    Name http\n    Match *\n    Host {origin.hostname}\n    Port {port}\n    URI {openobserve_endpoint(clean['organization'], clean['stream'])}\n    Format json\n    Json_date_key _timestamp\n    Json_date_format iso8601\n    tls On\n    tls.verify On\n{auth}    storage.total_limit_size 128M\n"""
+    company = clean["company_name"] or clean["organization"]
+    return f"""[SERVICE]\n    Flush 5\n    Log_Level info\n    Parsers_File {parsers_file}\n    storage.path {storage_path}\n    storage.sync normal\n    storage.checksum on\n\n[INPUT]\n    Name syslog\n    Mode tcp\n    Listen 127.0.0.1\n    Port 5514\n    # DSM Log Center uses RFC 6587 octet-counting framing over TCP.\n    Format octet_counting\n    Parser syslog-rfc5424\n    storage.type filesystem\n\n[FILTER]\n    Name record_modifier\n    Match *\n    Record idnnov_company {company}\n    Record idnnov_nas {clean['nas_name']}\n    Record idnnov_device_id {clean['device_id']}\n\n[OUTPUT]\n    Name http\n    Match *\n    Host {origin.hostname}\n    Port {port}\n    URI {openobserve_endpoint(clean['organization'], clean['stream'])}\n    Format json\n    Json_date_key _timestamp\n    Json_date_format iso8601\n    tls On\n    tls.verify On\n{auth}    storage.total_limit_size 128M\n"""

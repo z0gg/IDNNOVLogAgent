@@ -6,7 +6,7 @@ from idnnov_agent import api
 
 
 class ApiSecurityTests(unittest.TestCase):
-    SETTINGS = {"collector_url":"https://logs.example.com", "organization":"laroche", "stream":"synology_logs", "nas_name":"GRLAROCHE-SRV", "device_id":"d", "ingest_user":"nas-ingest"}
+    SETTINGS = {"collector_url":"https://logs.example.com", "organization":"3IpSzrDn5K5UpPiprhpEXsmj3bR", "company_name":"Laroche", "stream":"synology_logs", "nas_name":"GRLAROCHE-SRV", "device_id":"d", "ingest_user":"nas-ingest"}
 
     def test_requires_dsm_session_and_admin(self):
         self.assertEqual(api.handle({}, b"{}").status, 403)
