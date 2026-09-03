@@ -42,7 +42,9 @@ export default {async fetch(request,env){
   const p=compatible[0];
   return json({packages:[{
     package:p.package,version:p.version,dname:p.dname||p.package,desc:p.desc||'',
-    link:p.url,thumbnail:[],qinst:false,qupgrade:false,qstart:false,
+    link:p.url,thumbnail:Array.isArray(p.thumbnail)?p.thumbnail:[],
+    thumbnail_retina:Array.isArray(p.thumbnail_retina)?p.thumbnail_retina:[],
+    qinst:false,qupgrade:false,qstart:false,
     deppkgs:null,conflictpkgs:null,download_count:0,recent_download_count:0,
     snapshot:[],md5:p.md5,size:p.size,startable:'yes',
     changelog:p.changelog||'',distributor:'IDNNOV',distributor_url:'https://idnnov.com',
