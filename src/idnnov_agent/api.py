@@ -34,7 +34,7 @@ def get_status():
         pid = int(pid_file.read_text().strip()); os.kill(pid, 0); running = True
     except (OSError, ValueError): pass
     buffer_bytes = sum(p.stat().st_size for p in (pkgvar / "buffer").glob("**/*") if p.is_file()) if (pkgvar / "buffer").exists() else 0
-    return {"running":running,"package_version":"1.0.10-1011","fluent_bit_version":"5.0.9","destination":persistence.load_public(ETC)["collector_url"],"listener":"127.0.0.1:5514","buffer_bytes":buffer_bytes,"buffer_limit_bytes":134217728}
+    return {"running":running,"package_version":"1.0.11-1012","fluent_bit_version":"5.0.9","destination":persistence.load_public(ETC)["collector_url"],"listener":"127.0.0.1:5514","buffer_bytes":buffer_bytes,"buffer_limit_bytes":134217728}
 
 def _service(action):
     script = Path(os.environ.get("SYNOPKG_PKGDEST", "/var/packages/IDNNOVLogAgent/target")) / "scripts/service-setup"

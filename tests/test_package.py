@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 class PackageTests(unittest.TestCase):
-    SPK = Path("artifacts/IDNNOVLogAgent-1.0.10-1011-x86_64.spk")
+    SPK = Path("artifacts/IDNNOVLogAgent-1.0.11-1012-x86_64.spk")
 
     def test_info_declares_conf_folder_support_and_package_checksum(self):
         import hashlib, tarfile
@@ -87,7 +87,7 @@ class PackageTests(unittest.TestCase):
         self.assertTrue(self.SPK.is_file())
         with tarfile.open(self.SPK) as outer:
             info = outer.extractfile("INFO").read().decode()
-            self.assertIn('version="1.0.10-1011"', info)
+            self.assertIn('version="1.0.11-1012"', info)
             self.assertIn('os_min_ver="7.2-72806"', info)
             for arch in ("r1000", "r1000nk", "v1000", "v1000nk", "geminilake", "apollolake", "epyc7002"):
                 self.assertIn(arch, info)
@@ -105,6 +105,17 @@ class PackageTests(unittest.TestCase):
             "PACKAGE_ICON_256.PNG",
         ):
             self.assertIn(required, names)
+
+    def test_package_icons_are_real_transparent_pngs_at_dsm_sizes(self):
+        import struct
+        with tarfile.open(self.SPK) as outer:
+            for name, expected in (("PACKAGE_ICON.PNG", 64), ("PACKAGE_ICON_256.PNG", 256)):
+                data = outer.extractfile(name).read()
+                self.assertEqual(data[:8], b"\x89PNG\r\n\x1a\n")
+                width, height, depth, color_type = struct.unpack(">IIBB", data[16:26])
+                self.assertEqual((width, height), (expected, expected))
+                self.assertEqual(depth, 8)
+                self.assertEqual(color_type, 6, "icon must retain RGBA transparency")
 
     def test_package_never_requests_root(self):
         with tarfile.open(self.SPK) as outer:
