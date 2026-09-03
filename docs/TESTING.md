@@ -1,6 +1,6 @@
 # Test evidence and DSM matrix
 
-Automated tests cover HTTPS origin normalization, endpoint validation, SSRF ranges, deterministic Fluent Bit generation, token separation/preservation/deletion, settings migration, transactional validation and restart rollback, DNS/TCP/TLS/certificate/HTTP/auth classification, backend authentication/authorization/schema limits, package metadata, and multi-architecture catalogue filtering.
+Automated tests cover HTTPS origin normalization, OpenObserve organization/stream validation, SSRF ranges, deterministic Fluent Bit generation with company/NAS metadata, ingestion-password separation/preservation/deletion, settings migration, transactional validation and restart rollback, DNS/TCP/TLS/certificate/HTTP/auth classification, backend authentication/authorization/schema limits, package metadata, and multi-architecture catalogue filtering.
 
 Required representative physical matrix before declaring the fleet release production-validated:
 

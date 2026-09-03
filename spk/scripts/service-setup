@@ -18,7 +18,24 @@ case "${1:-}" in
     if ! kill -0 "$(sed -n '1p' "$FB_PID")" 2>/dev/null; then rm -f "$FB_PID"; exit 1; fi
     ;;
   stop)
-    if test -r "$FB_PID"; then kill "$(sed -n '1p' "$FB_PID")" 2>/dev/null || true; fi
+    if test -r "$FB_PID"; then
+      PID="$(sed -n '1p' "$FB_PID")"
+      if kill -0 "$PID" 2>/dev/null; then
+        kill "$PID" 2>/dev/null || true
+        # Fluent Bit's configured graceful shutdown can take five seconds.
+        # Do not allow a following start to race the loopback listener.
+        WAITED=0
+        while kill -0 "$PID" 2>/dev/null && test "$WAITED" -lt 10; do
+          sleep 1
+          WAITED=$((WAITED + 1))
+        done
+        if kill -0 "$PID" 2>/dev/null; then
+          kill -KILL "$PID" 2>/dev/null || true
+          sleep 1
+        fi
+        kill -0 "$PID" 2>/dev/null && exit 1
+      fi
+    fi
     rm -f "$FB_PID"
     ;;
   status)

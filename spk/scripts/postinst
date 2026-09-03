@@ -5,11 +5,14 @@ install -d -m 0700 "$PKG_VAR/etc" "$PKG_VAR/buffer"
 if test ! -f "$PKG_VAR/etc/settings.json"; then
   DEVICE_ID="$(cat /proc/sys/kernel/random/uuid)"
   COLLECTOR="${wizard_collector_url:-https://logs.idnnov.com}"
-  printf '{"collector_url":"%s","customer_id":"","device_id":"%s","endpoint":"/v1/logs","site_id":""}\n' "$COLLECTOR" "$DEVICE_ID" > "$PKG_VAR/etc/settings.json"
+  ORGANIZATION="${wizard_organization:-default}"
+  STREAM="${wizard_stream:-synology_logs}"
+  INGEST_USER="${wizard_ingest_user:-}"
+  printf '{"collector_url":"%s","organization":"%s","stream":"%s","nas_name":"","device_id":"%s","ingest_user":"%s"}\n' "$COLLECTOR" "$ORGANIZATION" "$STREAM" "$DEVICE_ID" "$INGEST_USER" > "$PKG_VAR/etc/settings.json"
   chmod 0600 "$PKG_VAR/etc/settings.json"
 fi
-if test -n "${wizard_token:-}" && test ! -f "$PKG_VAR/etc/token"; then
-  printf %s "$wizard_token" > "$PKG_VAR/etc/token"
+if test -n "${wizard_password:-}" && test ! -f "$PKG_VAR/etc/token"; then
+  printf %s "$wizard_password" > "$PKG_VAR/etc/token"
   chmod 0600 "$PKG_VAR/etc/token"
 fi
 export PYTHONPATH="${SYNOPKG_PKGDEST:?}/lib"

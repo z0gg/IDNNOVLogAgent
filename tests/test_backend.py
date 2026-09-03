@@ -1,4 +1,3 @@
-import io
 import json
 import unittest
 from unittest import mock
@@ -7,6 +6,8 @@ from idnnov_agent import api
 
 
 class ApiSecurityTests(unittest.TestCase):
+    SETTINGS = {"collector_url":"https://logs.example.com", "organization":"laroche", "stream":"synology_logs", "nas_name":"GRLAROCHE-SRV", "device_id":"d", "ingest_user":"nas-ingest"}
+
     def test_requires_dsm_session_and_admin(self):
         self.assertEqual(api.handle({}, b"{}").status, 403)
         with mock.patch.object(api, "is_admin", return_value=False):
@@ -23,17 +24,26 @@ class ApiSecurityTests(unittest.TestCase):
 
     def test_responses_do_not_leak_secrets(self):
         base = {"REMOTE_USER":"admin", "REQUEST_METHOD":"POST", "CONTENT_TYPE":"application/json"}
-        with mock.patch.object(api, "is_admin", return_value=True), mock.patch.object(api, "get_settings", return_value={"token_configured":True}):
+        with mock.patch.object(api, "is_admin", return_value=True), mock.patch.object(api, "get_settings", return_value={"ingest_password_configured":True}):
             response = api.handle(base, b'{"action":"get_settings"}')
+        self.assertNotIn("password\"", response.body)
         self.assertNotIn("token\"", response.body)
 
-    def test_save_uses_strict_schema_and_token_action(self):
+    def test_save_uses_strict_openobserve_schema_and_password_action(self):
         env = {"REMOTE_USER":"admin", "REQUEST_METHOD":"POST", "CONTENT_TYPE":"application/json"}
-        body = json.dumps({"action":"save_settings","settings":{"collector_url":"https://logs.example.com","endpoint":"/v1/logs","customer_id":"c","site_id":"s","device_id":"d"},"token_action":"preserve"}).encode()
+        body = json.dumps({"action":"save_settings","settings":self.SETTINGS,"password_action":"preserve"}).encode()
         with mock.patch.object(api, "is_admin", return_value=True), mock.patch.object(api, "save_settings", return_value={"applied":True}) as save:
             response = api.handle(env, body)
         self.assertEqual(response.status, 200)
         save.assert_called_once()
+
+    def test_connection_schema_requires_openobserve_scope_and_user(self):
+        env = {"REMOTE_USER":"admin", "REQUEST_METHOD":"POST", "CONTENT_TYPE":"application/json"}
+        body = json.dumps({"action":"test_connection","collector_url":"https://logs.example.com","organization":"laroche","stream":"synology_logs","ingest_user":"nas-ingest"}).encode()
+        with mock.patch.object(api, "is_admin", return_value=True), mock.patch("idnnov_agent.api.persistence.load_public", return_value={"ingest_password_configured":False, "ingest_user":""}), mock.patch("idnnov_agent.api.connection.test", return_value={"success":True,"code":"SUCCESS"}) as test:
+            response = api.handle(env, body)
+        self.assertEqual(response.status, 200)
+        test.assert_called_once()
 
     def test_status_is_secret_free(self):
         env = {"REMOTE_USER":"admin", "REQUEST_METHOD":"POST", "CONTENT_TYPE":"application/json"}

@@ -1,5 +1,5 @@
+import base64
 import json
-import os
 import socket
 import ssl
 import stat
@@ -26,53 +26,77 @@ class UrlTests(unittest.TestCase):
             with self.subTest(address=address), self.assertRaises(ValueError):
                 config.validate_resolved_addresses([address])
 
-    def test_validates_endpoint(self):
-        self.assertEqual(config.validate_endpoint("/v1/logs"), "/v1/logs")
-        for value in ["v1/logs", "//evil.test/x", "/x\ny", "/../admin", "/x#frag"]:
+    def test_validates_openobserve_identifiers(self):
+        self.assertEqual(config.validate_identifier("LaRoche"), "laroche")
+        self.assertEqual(config.openobserve_endpoint("laroche", "synology_logs"), "/api/laroche/synology_logs/_json")
+        for value in ["", "two words", "../../admin", "name\nHeader"]:
             with self.subTest(value=value), self.assertRaises(ValueError):
-                config.validate_endpoint(value)
+                config.validate_identifier(value)
 
 
 class FluentConfigTests(unittest.TestCase):
-    def test_generation_is_deterministic_and_safe(self):
-        settings = {"collector_url":"https://logs.example.com", "endpoint":"/v1/logs", "customer_id":"a\nb", "site_id":"s", "device_id":"d"}
-        first = config.render_fluent_bit(settings, "/run/token", "/var/buffer", "/opt/idnnov/parsers.conf")
-        second = config.render_fluent_bit(dict(reversed(list(settings.items()))), "/run/token", "/var/buffer", "/opt/idnnov/parsers.conf")
+    def settings(self):
+        return {"collector_url":"https://logs.example.com", "organization":"laroche", "stream":"synology_logs", "nas_name":"GRLAROCHE-SRV", "device_id":"stable-device", "ingest_user":"nas-ingest"}
+
+    def test_generation_is_deterministic_and_openobserve_native(self):
+        password = "0123456789abcdef"
+        first = config.render_fluent_bit(self.settings(), password, "/var/buffer", "/opt/idnnov/parsers.conf")
+        second = config.render_fluent_bit(dict(reversed(list(self.settings().items()))), password, "/var/buffer", "/opt/idnnov/parsers.conf")
         self.assertEqual(first, second)
-        self.assertIn("Listen 127.0.0.1", first)
-        self.assertIn("Port 5514", first)
-        self.assertIn("tls.verify On", first)
-        self.assertIn("storage.total_limit_size 128M", first)
-        self.assertIn("Parsers_File /opt/idnnov/parsers.conf", first)
-        self.assertNotIn("a\nb", first)
+        for expected in ("Listen 127.0.0.1", "Port 5514", "Format octet_counting", "tls.verify On", "storage.total_limit_size 128M", "Parsers_File /opt/idnnov/parsers.conf", "URI /api/laroche/synology_logs/_json", "Format json", "HTTP_User nas-ingest", "HTTP_Passwd 0123456789abcdef", "Record idnnov_company laroche", "Record idnnov_nas GRLAROCHE-SRV", "Record idnnov_device_id stable-device"):
+            self.assertIn(expected, first)
+
+    def test_invalid_labels_cannot_inject_fluent_bit_directives(self):
+        settings = self.settings()
+        settings["nas_name"] = "a\n[OUTPUT]"
+        with self.assertRaises(ValueError):
+            config.render_fluent_bit(settings, "0123456789abcdef", "/var/buffer", "/opt/parsers.conf")
+
+    def test_password_requires_ingest_username(self):
+        settings = self.settings()
+        settings["ingest_user"] = ""
+        with self.assertRaises(ValueError):
+            config.render_fluent_bit(settings, "0123456789abcdef", "/var/buffer", "/opt/parsers.conf")
 
 
 class PersistenceTests(unittest.TestCase):
-    def test_token_create_preserve_and_delete(self):
+    def test_password_create_preserve_and_delete(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
-            persistence.save(root, config.defaults("device"), token_action="replace", token="secret-value")
-            token_path = root / "token"
-            self.assertEqual(stat.S_IMODE(token_path.stat().st_mode), 0o600)
-            persistence.save(root, config.defaults("device"), token_action="preserve")
-            self.assertEqual(token_path.read_text(), "secret-value")
-            persistence.save(root, config.defaults("device"), token_action="delete")
-            self.assertFalse(token_path.exists())
+            settings = config.defaults("device")
+            settings["ingest_user"] = "nas-ingest"
+            persistence.save(root, settings, password_action="replace", password="0123456789abcdef")
+            password_path = root / "token"
+            self.assertEqual(stat.S_IMODE(password_path.stat().st_mode), 0o600)
+            persistence.save(root, settings, password_action="preserve")
+            self.assertEqual(password_path.read_text(), "0123456789abcdef")
+            persistence.save(root, settings, password_action="delete")
+            self.assertFalse(password_path.exists())
 
-    def test_frontend_never_receives_token(self):
+    def test_frontend_never_receives_password(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
-            persistence.save(root, config.defaults("device"), token_action="replace", token="never-return-me")
+            settings = config.defaults("device")
+            settings["ingest_user"] = "nas-ingest"
+            persistence.save(root, settings, password_action="replace", password="0123456789abcdef")
             public = persistence.load_public(root)
-            self.assertTrue(public["token_configured"])
+            self.assertTrue(public["ingest_password_configured"])
             self.assertNotIn("token", public)
-            self.assertNotIn("never-return-me", json.dumps(public))
+            self.assertNotIn("0123456789abcdef", json.dumps(public))
 
-    def test_migration_preserves_identity(self):
-        old = {"collector_url":"https://logs.example.com", "customer_id":"c", "site_id":"s", "device_id":"stable"}
+    def test_migration_preserves_identity_and_maps_legacy_fields(self):
+        old = {"collector_url":"https://logs.example.com", "customer_id":"Laroche", "site_id":"GRLAROCHE-SRV", "device_id":"stable"}
         migrated = persistence.migrate(old)
         self.assertEqual(migrated["device_id"], "stable")
-        self.assertEqual(migrated["endpoint"], "/v1/logs")
+        self.assertEqual(migrated["organization"], "Laroche")
+        self.assertEqual(migrated["nas_name"], "GRLAROCHE-SRV")
+        self.assertEqual(migrated["stream"], "synology_logs")
+    def test_legacy_bearer_token_is_not_advertised_as_basic_password(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            (root / "settings.json").write_text(json.dumps({"collector_url":"https://logs.example.com", "customer_id":"Laroche", "site_id":"GRLAROCHE-SRV", "device_id":"stable"}))
+            (root / "token").write_text("legacy-bearer-token")
+            self.assertFalse(persistence.load_public(root)["ingest_password_configured"])
 
 
 class TransactionTests(unittest.TestCase):
@@ -98,16 +122,28 @@ class TransactionTests(unittest.TestCase):
 class ConnectionTests(unittest.TestCase):
     def test_classifies_dns(self):
         with mock.patch("socket.getaddrinfo", side_effect=socket.gaierror()):
-            self.assertEqual(connection.test("https://no.test", "/v1/logs", None)["code"], "DNS_FAILED")
+            self.assertEqual(connection.test("https://no.test", "laroche", "synology_logs", "nas-ingest", "0123456789abcdef")["code"], "DNS_FAILED")
 
     def test_classifies_tcp(self):
         with mock.patch("socket.getaddrinfo", return_value=[(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("8.8.8.8", 443))]), mock.patch("socket.create_connection", side_effect=TimeoutError()):
-            self.assertEqual(connection.test("https://example.test", "/v1/logs", None)["code"], "TCP_TIMEOUT")
+            self.assertEqual(connection.test("https://example.test", "laroche", "synology_logs", "nas-ingest", "0123456789abcdef")["code"], "TCP_TIMEOUT")
 
     def test_classifies_certificate(self):
-        with mock.patch("socket.getaddrinfo", return_value=[(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("8.8.8.8", 443))]), mock.patch("socket.create_connection") as tcp, mock.patch("ssl.create_default_context") as ctx:
+        with mock.patch("socket.getaddrinfo", return_value=[(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("8.8.8.8", 443))]), mock.patch("socket.create_connection"), mock.patch("ssl.create_default_context") as ctx:
             ctx.return_value.wrap_socket.side_effect = ssl.SSLCertVerificationError(1, "bad")
-            self.assertEqual(connection.test("https://example.test", "/v1/logs", None)["code"], "TLS_CERTIFICATE_INVALID")
+            self.assertEqual(connection.test("https://example.test", "laroche", "synology_logs", "nas-ingest", "0123456789abcdef")["code"], "TLS_CERTIFICATE_INVALID")
+
+    def test_connection_uses_basic_auth_and_empty_json_batch(self):
+        tls = mock.Mock()
+        tls.makefile.return_value.readline.return_value = b"HTTP/1.1 200 OK\r\n"
+        with mock.patch("socket.getaddrinfo", return_value=[(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("8.8.8.8", 443))]), mock.patch("socket.create_connection"), mock.patch("ssl.create_default_context") as ctx:
+            ctx.return_value.wrap_socket.return_value = tls
+            result = connection.test("https://example.test", "laroche", "synology_logs", "nas-ingest", "0123456789abcdef")
+        payload = tls.sendall.call_args.args[0].decode()
+        self.assertTrue(result["success"])
+        self.assertIn("POST /api/laroche/synology_logs/_json HTTP/1.1", payload)
+        self.assertIn("Authorization: Basic " + base64.b64encode(b"nas-ingest:0123456789abcdef").decode(), payload)
+        self.assertTrue(payload.endswith("\r\n\r\n[]"))
 
     def test_classifies_http_and_auth(self):
         self.assertEqual(connection.classify_http(401), "AUTHENTICATION_REFUSED")

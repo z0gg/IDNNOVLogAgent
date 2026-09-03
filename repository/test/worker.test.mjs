@@ -3,12 +3,12 @@ import assert from 'node:assert/strict';
 import worker from '../src/worker.mjs';
 
 const CATALOG_ENTRY={
-  package:'IDNNOVLogAgent',version:'1.0.11-1012',dname:'IDNNOV Log Agent',
-  desc:'Receives local RFC5424 syslog and forwards it to an HTTPS collector.',
+  package:'IDNNOVLogAgent',version:'1.1.0-1013',dname:'IDNNOV Log Agent',
+  desc:'Receives local RFC5424 syslog and forwards it to OpenObserve with company and NAS metadata.',
   arches:['apollolake','geminilake','r1000','v1000','epyc7002'],min_build:72806,max_build:99999,
-  url:'https://github.com/z0gg/IDNNOVLogAgent/releases/download/v1.0.11-1012/IDNNOVLogAgent-1.0.11-1012-x86_64.spk',
-  size:3102720,md5:'bb830d3c880e6277c545435f76085ee1',
-  sha256:'8da8291d3cafa83e0b55977ffba1b8ccc73edccef099e234b9c4d679f8ea0ce1',
+  url:'https://github.com/z0gg/IDNNOVLogAgent/releases/download/v1.1.0-1013/IDNNOVLogAgent-1.1.0-1013-x86_64.spk',
+  size:3102720,md5:'a914b96f114ba7184c78d26cb761359c',
+  sha256:'4e94b3d132e464b87ed413f3370515aeddab20474aaa76c255bb13df02cc87ed',
   thumbnail:['https://raw.githubusercontent.com/z0gg/IDNNOVLogAgent/19884a6351b23459b8a8a4316e1dfbadb891eb29/spk/PACKAGE_ICON.PNG','https://raw.githubusercontent.com/z0gg/IDNNOVLogAgent/19884a6351b23459b8a8a4316e1dfbadb891eb29/spk/PACKAGE_ICON_256.PNG'],
   thumbnail_retina:['https://raw.githubusercontent.com/z0gg/IDNNOVLogAgent/19884a6351b23459b8a8a4316e1dfbadb891eb29/spk/PACKAGE_ICON_256.PNG','https://raw.githubusercontent.com/z0gg/IDNNOVLogAgent/19884a6351b23459b8a8a4316e1dfbadb891eb29/spk/PACKAGE_ICON_256.PNG']};
 const env={CATALOG:JSON.stringify({packages:[CATALOG_ENTRY]})};
@@ -27,7 +27,7 @@ test('1b embedded versioned catalog works without a runtime binding',async()=>{
   assert.equal(r.status,200);
   const j=await r.json();
   assert.equal(j.packages.length,1);
-  assert.equal(j.packages[0].version,'1.0.11-1012');
+  assert.equal(j.packages[0].version,'1.1.0-1013');
   assert.deepEqual(j.packages[0].thumbnail,CATALOG_ENTRY.thumbnail);
   assert.deepEqual(j.packages[0].thumbnail_retina,CATALOG_ENTRY.thumbnail_retina);
 });
@@ -84,14 +84,14 @@ test('7 build below os_min_ver 72806 hides package; DSM 7.2.2 through DSM 7.4.1 
 test('7b AMD r1000 DS723+ DSM 7.2.2 receives the x86_64 release',async()=>{
   const j=await (await worker.fetch(new Request('https://packages.idnnov.com/?arch=r1000&build=72806&language=fre&major=7'),env)).json();
   assert.equal(j.packages.length,1);
-  assert.equal(j.packages[0].version,'1.0.11-1012');
+  assert.equal(j.packages[0].version,'1.1.0-1013');
 });
 
 test('7c DSM 7.4.1 NAS (build 90080) also receives the release',async()=>{
   for(const a of ['r1000','geminilake']){
     const j=await (await worker.fetch(new Request(`https://packages.idnnov.com/?arch=${a}&build=90080&language=fre&major=7&minor=4`),env)).json();
     assert.equal(j.packages.length,1,a);
-    assert.equal(j.packages[0].version,'1.0.11-1012',a);
+    assert.equal(j.packages[0].version,'1.1.0-1013',a);
   }
 });
 
@@ -130,7 +130,7 @@ test('13 multiple compatible releases yield only the newest promoted one',async(
   const two={packages:[CATALOG_ENTRY,{...CATALOG_ENTRY,version:'0.9.0-900',url:'https://github.com/z0gg/IDNNOVLogAgent/releases/download/v0.9.0-900/IDNNOVLogAgent-0.9.0-900-geminilake.spk',md5:'e'.repeat(32)}]};
   const j=await (await worker.fetch(new Request(GET),{CATALOG:JSON.stringify(two)})).json();
   assert.equal(j.packages.length,1);
-  assert.equal(j.packages[0].version,'1.0.11-1012');
+  assert.equal(j.packages[0].version,'1.1.0-1013');
 });
 
 test('14 malformed catalog or non-HTTPS URL fails closed with no partial response',async()=>{

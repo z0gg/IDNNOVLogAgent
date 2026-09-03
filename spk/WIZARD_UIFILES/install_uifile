@@ -1,6 +1,9 @@
 [
-  {"step_title":"IDNNOV Log Agent","items":[
-    {"type":"textfield","desc":"URL du collecteur HTTPS (modifiable après installation)","subitems":[{"key":"wizard_collector_url","defaultValue":"https://logs.idnnov.com","validator":{"allowBlank":false,"regex":"^https://[^/\\s]+/?$"}}]},
-    {"type":"password","desc":"Token optionnel","subitems":[{"key":"wizard_token","defaultValue":"","validator":{"allowBlank":true}}]}
+  {"step_title":"IDNNOV Log Agent — OpenObserve","items":[
+    {"type":"textfield","desc":"URL OpenObserve HTTPS (modifiable après installation)","subitems":[{"key":"wizard_collector_url","defaultValue":"https://logs.idnnov.com","validator":{"allowBlank":false,"regex":"^https://[^/\\s]+/?$"}}]},
+    {"type":"textfield","desc":"Organisation OpenObserve de la compagnie (ex. laroche)","subitems":[{"key":"wizard_organization","defaultValue":"default","validator":{"allowBlank":false,"regex":"^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$"}}]},
+    {"type":"textfield","desc":"Stream OpenObserve","subitems":[{"key":"wizard_stream","defaultValue":"synology_logs","validator":{"allowBlank":false,"regex":"^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$"}}]},
+    {"type":"textfield","desc":"Identifiant du compte d’ingestion (optionnel)","subitems":[{"key":"wizard_ingest_user","defaultValue":"","validator":{"allowBlank":true,"regex":"^[A-Za-z0-9_.@+\\-]*$"}}]},
+    {"type":"password","desc":"Mot de passe du compte d’ingestion (optionnel, modifiable après installation)","subitems":[{"key":"wizard_password","defaultValue":"","validator":{"allowBlank":true,"regex":"^[A-Za-z0-9_-]*$"}}]}
   ]}
 ]

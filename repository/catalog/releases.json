@@ -2,9 +2,10 @@
   "packages": [
     {
       "package": "IDNNOVLogAgent",
-      "version": "1.0.11-1012",
+      "version": "1.1.0-1013",
       "dname": "IDNNOV Log Agent",
-      "desc": "Receives local RFC5424 syslog and forwards it to an HTTPS collector.",
+      "desc": "Receives local RFC5424 syslog and forwards it to OpenObserve with company and NAS metadata.",
+      "changelog": "OpenObserve multi-company ingestion: organization, stream, NAS name and stable device ID; Basic Auth; legacy Bearer tokens are retained but inactive until replaced.",
       "arches": [
         "apollolake",
         "avoton",
@@ -30,10 +31,10 @@
       ],
       "min_build": 72806,
       "max_build": 99999,
-      "url": "https://github.com/z0gg/IDNNOVLogAgent/releases/download/v1.0.11-1012/IDNNOVLogAgent-1.0.11-1012-x86_64.spk",
+      "url": "https://github.com/z0gg/IDNNOVLogAgent/releases/download/v1.1.0-1013/IDNNOVLogAgent-1.1.0-1013-x86_64.spk",
       "size": 3102720,
-      "md5": "bb830d3c880e6277c545435f76085ee1",
-      "sha256": "8da8291d3cafa83e0b55977ffba1b8ccc73edccef099e234b9c4d679f8ea0ce1",
+      "md5": "a914b96f114ba7184c78d26cb761359c",
+      "sha256": "4e94b3d132e464b87ed413f3370515aeddab20474aaa76c255bb13df02cc87ed",
       "thumbnail": [
         "https://raw.githubusercontent.com/z0gg/IDNNOVLogAgent/19884a6351b23459b8a8a4316e1dfbadb891eb29/spk/PACKAGE_ICON.PNG",
         "https://raw.githubusercontent.com/z0gg/IDNNOVLogAgent/19884a6351b23459b8a8a4316e1dfbadb891eb29/spk/PACKAGE_ICON_256.PNG"

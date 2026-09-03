@@ -27,12 +27,12 @@
   {
     "mode": "0o644",
     "path": "lib/idnnov_agent/api.py",
-    "size": 4923
+    "size": 5916
   },
   {
     "mode": "0o644",
     "path": "lib/idnnov_agent/bootstrap.py",
-    "size": 633
+    "size": 922
   },
   {
     "mode": "0o644",
@@ -42,17 +42,17 @@
   {
     "mode": "0o644",
     "path": "lib/idnnov_agent/config.py",
-    "size": 3893
+    "size": 5438
   },
   {
     "mode": "0o644",
     "path": "lib/idnnov_agent/connection.py",
-    "size": 2070
+    "size": 2872
   },
   {
     "mode": "0o644",
     "path": "lib/idnnov_agent/persistence.py",
-    "size": 1777
+    "size": 2749
   },
   {
     "mode": "0o644",
@@ -62,7 +62,7 @@
   {
     "mode": "0o755",
     "path": "scripts/service-setup",
-    "size": 1113
+    "size": 1656
   },
   {
     "mode": "0o755",
@@ -87,7 +87,7 @@
   {
     "mode": "0o644",
     "path": "ui/help/index.html",
-    "size": 813
+    "size": 1786
   },
   {
     "mode": "0o644",
@@ -112,12 +112,12 @@
   {
     "mode": "0o644",
     "path": "ui/index.html",
-    "size": 1642
+    "size": 2422
   },
   {
     "mode": "0o755",
     "path": "ui/scripts/app.js",
-    "size": 1682
+    "size": 1958
   },
   {
     "mode": "0o644",

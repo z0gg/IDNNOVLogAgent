@@ -1,14 +1,34 @@
-"""Strict settings validation and deterministic Fluent Bit configuration."""
+"""OpenObserve settings validation and deterministic Fluent Bit configuration."""
 import ipaddress
 import re
+import socket
 from urllib.parse import urlsplit, urlunsplit
 
 DEFAULT_COLLECTOR = "https://logs.idnnov.com"
-DEFAULT_ENDPOINT = "/v1/logs"
+DEFAULT_ORGANIZATION = "default"
+DEFAULT_STREAM = "synology_logs"
+IDENTIFIER = re.compile(r"^[a-z0-9][a-z0-9_-]{0,127}$")
+INGEST_USER = re.compile(r"^[A-Za-z0-9_.@+-]{1,256}$")
+SECRET = re.compile(r"^[A-Za-z0-9_-]{16,512}$")
+
+
+def _default_nas_name():
+    try:
+        return _safe_label(socket.gethostname())
+    except OSError:
+        return "synology-nas"
+
 
 def defaults(device_id):
-    return {"collector_url": DEFAULT_COLLECTOR, "endpoint": DEFAULT_ENDPOINT,
-            "customer_id": "", "site_id": "", "device_id": device_id}
+    return {
+        "collector_url": DEFAULT_COLLECTOR,
+        "organization": DEFAULT_ORGANIZATION,
+        "stream": DEFAULT_STREAM,
+        "nas_name": _default_nas_name(),
+        "device_id": device_id,
+        "ingest_user": "",
+    }
+
 
 def validate_collector(value):
     if not isinstance(value, str) or any(ord(c) < 32 or ord(c) == 127 for c in value):
@@ -36,6 +56,7 @@ def validate_collector(value):
         authority += f":{port}"
     return urlunsplit(("https", authority, "", "", ""))
 
+
 def validate_resolved_addresses(addresses):
     for raw in addresses:
         try:
@@ -47,30 +68,64 @@ def validate_resolved_addresses(addresses):
             raise ValueError("destination address forbidden")
     return True
 
-def validate_endpoint(value):
-    if not isinstance(value, str) or len(value) > 256 or not value.startswith("/") or value.startswith("//"):
-        raise ValueError("invalid endpoint")
-    if any(ord(c) < 32 or ord(c) == 127 for c in value) or "#" in value or "?" in value:
-        raise ValueError("invalid endpoint")
-    if any(part in (".", "..") for part in value.split("/")):
-        raise ValueError("invalid endpoint")
-    return value
+
+def validate_identifier(value):
+    if not isinstance(value, str):
+        raise ValueError("invalid OpenObserve identifier")
+    normalized = value.strip().lower()
+    if not IDENTIFIER.fullmatch(normalized):
+        raise ValueError("invalid OpenObserve identifier")
+    return normalized
+
 
 def _safe_label(value):
-    if not isinstance(value, str) or len(value) > 128:
+    if not isinstance(value, str) or len(value) > 128 or any(ord(c) < 32 or ord(c) == 127 for c in value):
         raise ValueError("invalid label")
-    return re.sub(r"[^A-Za-z0-9_.:@/-]", "_", value)
+    normalized = re.sub(r"[^A-Za-z0-9_.:@/-]", "_", value.strip())
+    if not normalized:
+        raise ValueError("invalid label")
+    return normalized
 
-def render_fluent_bit(settings, token, storage_path, parsers_file):
-    origin = urlsplit(validate_collector(settings["collector_url"]))
-    endpoint = validate_endpoint(settings["endpoint"])
+
+def validate_ingest_user(value):
+    if value == "":
+        return ""
+    if not isinstance(value, str) or not INGEST_USER.fullmatch(value):
+        raise ValueError("invalid ingestion username")
+    return value
+
+
+def validate_ingest_password(value):
+    if not isinstance(value, str) or not SECRET.fullmatch(value):
+        raise ValueError("invalid ingestion password")
+    return value
+
+
+def openobserve_endpoint(organization, stream):
+    return f"/api/{validate_identifier(organization)}/{validate_identifier(stream)}/_json"
+
+
+def validate_settings(settings):
+    clean = dict(settings)
+    clean["collector_url"] = validate_collector(clean["collector_url"])
+    clean["organization"] = validate_identifier(clean["organization"])
+    clean["stream"] = validate_identifier(clean["stream"])
+    clean["nas_name"] = _safe_label(clean["nas_name"])
+    clean["device_id"] = _safe_label(clean["device_id"])
+    clean["ingest_user"] = validate_ingest_user(clean["ingest_user"])
+    return clean
+
+
+def render_fluent_bit(settings, password, storage_path, parsers_file):
+    clean = validate_settings(settings)
+    origin = urlsplit(clean["collector_url"])
     port = origin.port or 443
-    host = origin.hostname
-    customer = _safe_label(settings.get("customer_id", ""))
-    site = _safe_label(settings.get("site_id", ""))
-    device = _safe_label(settings["device_id"])
     auth = ""
-    if token:
-        if not isinstance(token, str) or len(token) > 8192 or any(c.isspace() or ord(c) < 33 or ord(c) > 126 for c in token): raise ValueError("invalid token")
-        auth = f"    Header Authorization Bearer {token}\n"
-    return f"""[SERVICE]\n    Flush 5\n    Log_Level info\n    Parsers_File {parsers_file}\n    storage.path {storage_path}\n    storage.sync normal\n    storage.checksum on\n\n[INPUT]\n    Name syslog\n    Mode tcp\n    Listen 127.0.0.1\n    Port 5514\n    # DSM Log Center uses RFC 6587 octet-counting framing over TCP.\n    Format octet_counting\n    Parser syslog-rfc5424\n    storage.type filesystem\n\n[OUTPUT]\n    Name http\n    Match *\n    Host {host}\n    Port {port}\n    URI {endpoint}\n    Format json_lines\n    tls On\n    tls.verify On\n{auth}    Header X-IDNNOV-Customer {customer}\n    Header X-IDNNOV-Site {site}\n    Header X-IDNNOV-Device {device}\n    storage.total_limit_size 128M\n"""
+    if password is not None:
+        password = validate_ingest_password(password)
+        if not clean["ingest_user"]:
+            raise ValueError("ingestion username required")
+        auth = f"    HTTP_User {clean['ingest_user']}\n    HTTP_Passwd {password}\n"
+    elif clean["ingest_user"]:
+        raise ValueError("ingestion password required")
+    return f"""[SERVICE]\n    Flush 5\n    Log_Level info\n    Parsers_File {parsers_file}\n    storage.path {storage_path}\n    storage.sync normal\n    storage.checksum on\n\n[INPUT]\n    Name syslog\n    Mode tcp\n    Listen 127.0.0.1\n    Port 5514\n    # DSM Log Center uses RFC 6587 octet-counting framing over TCP.\n    Format octet_counting\n    Parser syslog-rfc5424\n    storage.type filesystem\n\n[FILTER]\n    Name record_modifier\n    Match *\n    Record idnnov_company {clean['organization']}\n    Record idnnov_nas {clean['nas_name']}\n    Record idnnov_device_id {clean['device_id']}\n\n[OUTPUT]\n    Name http\n    Match *\n    Host {origin.hostname}\n    Port {port}\n    URI {openobserve_endpoint(clean['organization'], clean['stream'])}\n    Format json\n    Json_date_key _timestamp\n    Json_date_format iso8601\n    tls On\n    tls.verify On\n{auth}    storage.total_limit_size 128M\n"""
