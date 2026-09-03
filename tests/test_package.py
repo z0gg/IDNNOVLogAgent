@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 class PackageTests(unittest.TestCase):
-    SPK = Path("artifacts/IDNNOVLogAgent-1.0.9-1010-x86_64.spk")
+    SPK = Path("artifacts/IDNNOVLogAgent-1.0.10-1011-x86_64.spk")
 
     def test_info_declares_conf_folder_support_and_package_checksum(self):
         import hashlib, tarfile
@@ -79,6 +79,7 @@ class PackageTests(unittest.TestCase):
             with tarfile.open(fileobj=tf.extractfile("package.tgz"), mode="r:gz") as pt:
                 parser = pt.extractfile("etc/parsers.conf").read().decode()
         self.assertIn("Name        syslog-rfc5424", parser)
+        self.assertIn("Time_Strict Off", parser)
         self.assertIn('fluent-bit.log', service)
         self.assertNotIn('>/dev/null 2>&1', service)
 
@@ -86,7 +87,7 @@ class PackageTests(unittest.TestCase):
         self.assertTrue(self.SPK.is_file())
         with tarfile.open(self.SPK) as outer:
             info = outer.extractfile("INFO").read().decode()
-            self.assertIn('version="1.0.9-1010"', info)
+            self.assertIn('version="1.0.10-1011"', info)
             self.assertIn('os_min_ver="7.2-72806"', info)
             for arch in ("r1000", "r1000nk", "v1000", "v1000nk", "geminilake", "apollolake", "epyc7002"):
                 self.assertIn(arch, info)

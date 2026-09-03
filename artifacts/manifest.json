@@ -17,7 +17,7 @@
   {
     "mode": "0o644",
     "path": "etc/parsers.conf",
-    "size": 304
+    "size": 475
   },
   {
     "mode": "0o644",
@@ -27,7 +27,7 @@
   {
     "mode": "0o644",
     "path": "lib/idnnov_agent/api.py",
-    "size": 4922
+    "size": 4923
   },
   {
     "mode": "0o644",
