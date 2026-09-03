@@ -42,7 +42,7 @@
   {
     "mode": "0o644",
     "path": "lib/idnnov_agent/config.py",
-    "size": 6484
+    "size": 6416
   },
   {
     "mode": "0o644",
@@ -112,7 +112,7 @@
   {
     "mode": "0o644",
     "path": "ui/index.html",
-    "size": 3422
+    "size": 3421
   },
   {
     "mode": "0o755",

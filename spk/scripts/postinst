@@ -7,7 +7,7 @@ if test ! -f "$PKG_VAR/etc/settings.json"; then
   COLLECTOR="${wizard_collector_url:-https://logs.idnnov.com}"
   ORGANIZATION="${wizard_organization:-default}"
   COMPANY_NAME="${wizard_company_name:-}"
-  STREAM="${wizard_stream:-default}"
+  STREAM="${wizard_stream:-synology_logs}"
   INGEST_USER="${wizard_ingest_user:-}"
   printf '{"collector_url":"%s","organization":"%s","company_name":"%s","stream":"%s","nas_name":"","device_id":"%s","ingest_user":"%s"}\n' "$COLLECTOR" "$ORGANIZATION" "$COMPANY_NAME" "$STREAM" "$DEVICE_ID" "$INGEST_USER" > "$PKG_VAR/etc/settings.json"
   chmod 0600 "$PKG_VAR/etc/settings.json"

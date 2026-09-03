@@ -6,8 +6,7 @@ from urllib.parse import urlsplit, urlunsplit
 
 DEFAULT_COLLECTOR = "https://logs.idnnov.com"
 DEFAULT_ORGANIZATION = "default"
-# Matches the stream shown by OpenObserve's generated Fluent Bit snippet.
-DEFAULT_STREAM = "default"
+DEFAULT_STREAM = "synology_logs"
 STREAM_IDENTIFIER = re.compile(r"^[a-z0-9][a-z0-9_-]{0,127}$")
 # OpenObserve organization IDs are opaque, case-sensitive strings. Example:
 # 3IpSzrDn5K5UpPiprhpEXsmj3bR. Never normalize their case.

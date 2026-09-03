@@ -92,7 +92,7 @@ class PersistenceTests(unittest.TestCase):
         self.assertEqual(migrated["device_id"], "stable")
         self.assertEqual(migrated["organization"], "Laroche")
         self.assertEqual(migrated["nas_name"], "GRLAROCHE-SRV")
-        self.assertEqual(migrated["stream"], "default")
+        self.assertEqual(migrated["stream"], "synology_logs")
     def test_legacy_bearer_token_is_not_advertised_as_basic_password(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
