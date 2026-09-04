@@ -44,7 +44,7 @@ def get_status():
     settings = persistence.load_public(ETC)
     return {
         "running": running,
-        "package_version": "1.1.4-1017",
+        "package_version": "1.1.6-1021",
         "fluent_bit_version": "5.0.9",
         "destination": settings["collector_url"],
         "organization": settings["organization"],
@@ -89,8 +89,29 @@ def _response(status, code, data=None):
     return Response(status, json.dumps(value, sort_keys=True, separators=(",", ":")))
 
 
-def handle(env, raw):
+def authenticated_user(env):
+    """Resolve the DSM session user.
+
+    DSM 7 does not pass REMOTE_USER to third-party package CGIs. The documented
+    mechanism is running webman's authenticate.cgi from within the CGI: the web
+    server supplies the session cookies to the child process automatically.
+    """
     user = env.get("REMOTE_USER", "")
+    if user:
+        return user
+    try:
+        proc = subprocess.run(
+            ["/usr/syno/synoman/webman/modules/authenticate.cgi"],
+            capture_output=True, text=True, timeout=5, check=False)
+    except (OSError, subprocess.TimeoutExpired):
+        return ""
+    if proc.returncode != 0:
+        return ""
+    return proc.stdout.strip()[:128]
+
+
+def handle(env, raw):
+    user = authenticated_user(env)
     if not user or not is_admin(user):
         return _response(403, "ADMIN_REQUIRED")
     if env.get("REQUEST_METHOD") != "POST":

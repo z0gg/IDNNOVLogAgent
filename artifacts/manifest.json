@@ -2,7 +2,7 @@
   {
     "mode": "0o755",
     "path": "bin/api.cgi",
-    "size": 143
+    "size": 1028
   },
   {
     "mode": "0o755",
@@ -27,7 +27,7 @@
   {
     "mode": "0o644",
     "path": "lib/idnnov_agent/api.py",
-    "size": 5916
+    "size": 6623
   },
   {
     "mode": "0o644",
@@ -56,6 +56,11 @@
   },
   {
     "mode": "0o644",
+    "path": "lib/idnnov_agent/qcgi.py",
+    "size": 5365
+  },
+  {
+    "mode": "0o644",
     "path": "lib/idnnov_agent/transaction.py",
     "size": 1148
   },
@@ -67,7 +72,7 @@
   {
     "mode": "0o755",
     "path": "ui/api.cgi",
-    "size": 143
+    "size": 1028
   },
   {
     "mode": "0o644",
@@ -117,7 +122,7 @@
   {
     "mode": "0o755",
     "path": "ui/scripts/app.js",
-    "size": 2024
+    "size": 2359
   },
   {
     "mode": "0o644",
