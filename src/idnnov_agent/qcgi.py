@@ -76,7 +76,9 @@ def unmask(masked, nonce):
     import base64
     raw = base64.b64decode(masked)
     key = nonce.encode()
-    return bytes(b ^ key[i % len(key)] for i, b in enumerate(raw)).decode()
+    # Strip whitespace the clipboard may introduce (secret managers often
+    # copy a trailing newline); the XOR mask is computed on the trimmed text.
+    return bytes(b ^ key[i % len(key)] for i, b in enumerate(raw)).decode().strip()
 
 
 def main():

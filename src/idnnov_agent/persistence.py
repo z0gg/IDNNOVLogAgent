@@ -47,6 +47,7 @@ def save(root, settings, password_action="preserve", password=None):
     clean = config.validate_settings(migrate(settings))
     password_path = root / "token"  # Stable private path retained through upgrades.
     if password_action == "replace":
+        password = password.strip() if isinstance(password, str) else password
         config.validate_ingest_password(password)
         if not clean["ingest_user"]:
             raise ValueError("ingestion username required")

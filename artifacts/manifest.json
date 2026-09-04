@@ -27,12 +27,12 @@
   {
     "mode": "0o644",
     "path": "lib/idnnov_agent/api.py",
-    "size": 6623
+    "size": 6631
   },
   {
     "mode": "0o644",
     "path": "lib/idnnov_agent/bootstrap.py",
-    "size": 922
+    "size": 1068
   },
   {
     "mode": "0o644",
@@ -52,12 +52,12 @@
   {
     "mode": "0o644",
     "path": "lib/idnnov_agent/persistence.py",
-    "size": 2806
+    "size": 2885
   },
   {
     "mode": "0o644",
     "path": "lib/idnnov_agent/qcgi.py",
-    "size": 5365
+    "size": 5525
   },
   {
     "mode": "0o644",
@@ -122,7 +122,7 @@
   {
     "mode": "0o755",
     "path": "ui/scripts/app.js",
-    "size": 2359
+    "size": 2892
   },
   {
     "mode": "0o644",

@@ -44,7 +44,7 @@ def get_status():
     settings = persistence.load_public(ETC)
     return {
         "running": running,
-        "package_version": "1.1.6-1021",
+        "package_version": "1.1.6-1022",
         "fluent_bit_version": "5.0.9",
         "destination": settings["collector_url"],
         "organization": settings["organization"],
@@ -149,7 +149,7 @@ def handle(env, raw):
         if set(value) != required:
             return _response(400, "INVALID_SCHEMA")
         stored = persistence.load_public(ETC)
-        password = ((ETC / "token").read_text()
+        password = ((ETC / "token").read_text().strip()
                     if stored["ingest_password_configured"] and stored["ingest_user"] == value["ingest_user"]
                     else None)
         data = connection.test(value["collector_url"], value["organization"], value["stream"], value["ingest_user"], password)

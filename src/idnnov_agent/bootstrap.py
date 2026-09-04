@@ -13,7 +13,9 @@ def main():
     raw = json.loads((etc / "settings.json").read_text())
     # Persists migrations (old generic endpoint/customer/site settings) atomically.
     settings = persistence.save(etc, raw, password_action="preserve")
-    password = (etc / "token").read_text() if settings["ingest_user"] and (etc / "token").is_file() else None
+    # Secret managers and shells frequently leave a trailing newline in the
+    # stored token; strip it before validation and rendering.
+    password = (etc / "token").read_text().strip() if settings["ingest_user"] and (etc / "token").is_file() else None
     candidate = etc / "fluent-bit.conf.tmp"
     candidate.write_text(render_fluent_bit(settings, password, str(root / "buffer"), str(pkg / "etc/parsers.conf")))
     candidate.chmod(0o600)
