@@ -1,3 +1,3 @@
 {
-  "SYNO.SDS.App.IDNNOVLogAgent.Instance": {"launchable": true, "title": "IDNNOV Log Agent", "width": 850, "height": 650}
+  "com.idnnov.packages.IDNNOVLogAgent": {"launchable": true, "title": "IDNNOV Log Agent", "width": 850, "height": 650}
 }

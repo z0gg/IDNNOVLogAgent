@@ -1,0 +1,3 @@
+{
+  ".url": {"com.idnnov.packages.IDNNOVLogAgent": {"type":"legacy","title":"IDNNOV Log Agent","desc":"IDNNOV Log Agent","icon":"images/icon-{0}.png","protocol":"https","port":"5001","url":"/webman/3rdparty/IDNNOVLogAgent/index.html"}}
+}

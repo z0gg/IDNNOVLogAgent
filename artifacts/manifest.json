@@ -76,13 +76,13 @@
   },
   {
     "mode": "0o644",
-    "path": "ui/app.config",
-    "size": 240
+    "path": "ui/config",
+    "size": 238
   },
   {
     "mode": "0o644",
     "path": "ui/config.define",
-    "size": 125
+    "size": 123
   },
   {
     "mode": "0o644",
