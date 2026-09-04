@@ -3,10 +3,10 @@ import assert from 'node:assert/strict';
 import worker from '../src/worker.mjs';
 
 const CATALOG_ENTRY={
-  package:'IDNNOVLogAgent',version:'1.1.8-1025',dname:'IDNNOV Log Agent',
+  package:'IDNNOVLogAgent',version:'1.1.9-1026',dname:'IDNNOV Log Agent',
   desc:'Receives local RFC5424 syslog and forwards it to OpenObserve with company and NAS metadata.',
   arches:['apollolake','geminilake','r1000','v1000','epyc7002'],min_build:72806,max_build:99999,
-  url:'https://github.com/z0gg/IDNNOVLogAgent/releases/download/v1.1.8-1025/IDNNOVLogAgent-1.1.8-1025-x86_64.spk',
+  url:'https://github.com/z0gg/IDNNOVLogAgent/releases/download/v1.1.9-1026/IDNNOVLogAgent-1.1.9-1026-x86_64.spk',
   size:3102720,md5:'49710da85b75a46ff10400c2de437f74',
   sha256:'693b83e0aaab6fb124b2560075b010deb733d3123bf09d5e1bd900c97ee5f979',
   thumbnail:['https://raw.githubusercontent.com/z0gg/IDNNOVLogAgent/19884a6351b23459b8a8a4316e1dfbadb891eb29/spk/PACKAGE_ICON.PNG','https://raw.githubusercontent.com/z0gg/IDNNOVLogAgent/19884a6351b23459b8a8a4316e1dfbadb891eb29/spk/PACKAGE_ICON_256.PNG'],
@@ -27,7 +27,7 @@ test('1b embedded versioned catalog works without a runtime binding',async()=>{
   assert.equal(r.status,200);
   const j=await r.json();
   assert.equal(j.packages.length,1);
-  assert.equal(j.packages[0].version,'1.1.8-1025');
+  assert.equal(j.packages[0].version,'1.1.9-1026');
   assert.deepEqual(j.packages[0].thumbnail,CATALOG_ENTRY.thumbnail);
   assert.deepEqual(j.packages[0].thumbnail_retina,CATALOG_ENTRY.thumbnail_retina);
 });
@@ -84,14 +84,14 @@ test('7 build below os_min_ver 72806 hides package; DSM 7.2.2 through DSM 7.4.1 
 test('7b AMD r1000 DS723+ DSM 7.2.2 receives the x86_64 release',async()=>{
   const j=await (await worker.fetch(new Request('https://packages.idnnov.com/?arch=r1000&build=72806&language=fre&major=7'),env)).json();
   assert.equal(j.packages.length,1);
-  assert.equal(j.packages[0].version,'1.1.8-1025');
+  assert.equal(j.packages[0].version,'1.1.9-1026');
 });
 
 test('7c DSM 7.4.1 NAS (build 90080) also receives the release',async()=>{
   for(const a of ['r1000','geminilake']){
     const j=await (await worker.fetch(new Request(`https://packages.idnnov.com/?arch=${a}&build=90080&language=fre&major=7&minor=4`),env)).json();
     assert.equal(j.packages.length,1,a);
-    assert.equal(j.packages[0].version,'1.1.8-1025',a);
+    assert.equal(j.packages[0].version,'1.1.9-1026',a);
   }
 });
 
@@ -130,7 +130,7 @@ test('13 multiple compatible releases yield only the newest promoted one',async(
   const two={packages:[CATALOG_ENTRY,{...CATALOG_ENTRY,version:'0.9.0-900',url:'https://github.com/z0gg/IDNNOVLogAgent/releases/download/v0.9.0-900/IDNNOVLogAgent-0.9.0-900-geminilake.spk',md5:'e'.repeat(32)}]};
   const j=await (await worker.fetch(new Request(GET),{CATALOG:JSON.stringify(two)})).json();
   assert.equal(j.packages.length,1);
-  assert.equal(j.packages[0].version,'1.1.8-1025');
+  assert.equal(j.packages[0].version,'1.1.9-1026');
 });
 
 test('14 malformed catalog or non-HTTPS URL fails closed with no partial response',async()=>{
