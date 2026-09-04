@@ -44,7 +44,7 @@ def get_status():
     settings = persistence.load_public(ETC)
     return {
         "running": running,
-        "package_version": "1.1.6-1022",
+        "package_version": "1.1.8-1024",
         "fluent_bit_version": "5.0.9",
         "destination": settings["collector_url"],
         "organization": settings["organization"],

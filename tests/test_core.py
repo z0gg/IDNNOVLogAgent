@@ -143,6 +143,7 @@ class ConnectionTests(unittest.TestCase):
             result = connection.test("https://example.test", "laroche", "synology_logs", "nas-ingest", "0123456789abcdef")
         payload = tls.sendall.call_args.args[0].decode()
         self.assertTrue(result["success"])
+        self.assertEqual(result["http_status"], 200)
         self.assertIn("POST /api/laroche/synology_logs/_json HTTP/1.1", payload)
         self.assertIn("Authorization: Basic " + base64.b64encode(b"nas-ingest:0123456789abcdef").decode(), payload)
         self.assertTrue(payload.endswith("\r\n\r\n[]"))

@@ -16,7 +16,8 @@ def classify_http(status):
 
 
 def _result(code):
-    return {"success": code == "SUCCESS", "code": code}
+    result = {"success": code == "SUCCESS", "code": code}
+    return result
 
 
 def test(collector, organization, stream, ingest_user, password, timeout=5):
@@ -57,7 +58,9 @@ def test(collector, organization, stream, ingest_user, password, timeout=5):
             line = tls.makefile("rb", buffering=0).readline(4096).decode("ascii", "replace")
             tls.close()
             status = int(line.split()[1])
-            return _result(classify_http(status))
+            result = _result(classify_http(status))
+            result["http_status"] = status
+            return result
         except ssl.SSLCertVerificationError:
             return _result("TLS_CERTIFICATE_INVALID")
         except ssl.SSLError:
