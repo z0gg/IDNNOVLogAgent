@@ -1,48 +1,48 @@
 {
-  "packages": [
-    {
-      "package": "IDNNOVLogAgent",
-      "version": "1.1.6-1022",
-      "dname": "IDNNOV Log Agent",
-      "desc": "Receives local RFC5424 syslog and forwards it to OpenObserve with company and NAS metadata.",
-      "changelog": "Fixes the UI on real DSM: web server requires the X-SYNO-TOKEN CSRF header on package CGI calls; the UI now sends it from the DSM session. Tokens pasted with trailing whitespace are normalized. Validated end-to-end on DSM 7.2.2 (UI Apply + OpenObserve 200).",
-      "arches": [
-        "apollolake",
-        "avoton",
-        "braswell",
-        "broadwell",
-        "broadwellnk",
-        "broadwellnkv2",
-        "broadwellntbap",
-        "bromolow",
-        "cedarview",
-        "denverton",
-        "epyc7002",
-        "geminilake",
-        "geminilakenk",
-        "grantley",
-        "icelaked",
-        "kvmx64",
-        "purley",
-        "r1000",
-        "r1000nk",
-        "v1000",
-        "v1000nk"
-      ],
-      "min_build": 72806,
-      "max_build": 99999,
-      "url": "https://github.com/z0gg/IDNNOVLogAgent/releases/download/v1.1.6-1022/IDNNOVLogAgent-1.1.6-1022-x86_64.spk",
-      "size": 3112960,
-      "md5": "46c52ffcb6c17189164a712bc9171ddd",
-      "sha256": "cb22658bde4619cfc9834beed7094250555890edee67ec1e9d45f0e3c3f6deeb",
-      "thumbnail": [
-        "https://raw.githubusercontent.com/z0gg/IDNNOVLogAgent/19884a6351b23459b8a8a4316e1dfbadb891eb29/spk/PACKAGE_ICON.PNG",
-        "https://raw.githubusercontent.com/z0gg/IDNNOVLogAgent/19884a6351b23459b8a8a4316e1dfbadb891eb29/spk/PACKAGE_ICON_256.PNG"
-      ],
-      "thumbnail_retina": [
-        "https://raw.githubusercontent.com/z0gg/IDNNOVLogAgent/19884a6351b23459b8a8a4316e1dfbadb891eb29/spk/PACKAGE_ICON_256.PNG",
-        "https://raw.githubusercontent.com/z0gg/IDNNOVLogAgent/19884a6351b23459b8a8a4316e1dfbadb891eb29/spk/PACKAGE_ICON_256.PNG"
-      ]
-    }
-  ]
+ "packages": [
+  {
+   "package": "IDNNOVLogAgent",
+   "version": "1.1.7-1023",
+   "dname": "IDNNOV Log Agent",
+   "desc": "Receives local RFC5424 syslog and forwards it to OpenObserve with company and NAS metadata.",
+   "changelog": "Timezone fix: Fluent Bit 5.0.9 dropped the RFC5424 UTC offset when %L and %z were combined in Time_Format, so events were indexed with NAS local time read as UTC (e.g. 4h shift for EDT) and appeared invisible in default UI time windows. The offset is now applied (validated on the Fluent Bit 5.0.9 bench).",
+   "arches": [
+    "apollolake",
+    "avoton",
+    "braswell",
+    "broadwell",
+    "broadwellnk",
+    "broadwellnkv2",
+    "broadwellntbap",
+    "bromolow",
+    "cedarview",
+    "denverton",
+    "epyc7002",
+    "geminilake",
+    "geminilakenk",
+    "grantley",
+    "icelaked",
+    "kvmx64",
+    "purley",
+    "r1000",
+    "r1000nk",
+    "v1000",
+    "v1000nk"
+   ],
+   "min_build": 72806,
+   "max_build": 99999,
+   "url": "https://github.com/z0gg/IDNNOVLogAgent/releases/download/v1.1.7-1023/IDNNOVLogAgent-1.1.7-1023-x86_64.spk",
+   "size": 3112960,
+   "md5": "62c67f46c208c26738bb53993e156eda",
+   "sha256": "dff57cab4124a974a934fa93db5fa99d1ff85265d5b7b4266cfb22771942aa93",
+   "thumbnail": [
+    "https://raw.githubusercontent.com/z0gg/IDNNOVLogAgent/19884a6351b23459b8a8a4316e1dfbadb891eb29/spk/PACKAGE_ICON.PNG",
+    "https://raw.githubusercontent.com/z0gg/IDNNOVLogAgent/19884a6351b23459b8a8a4316e1dfbadb891eb29/spk/PACKAGE_ICON_256.PNG"
+   ],
+   "thumbnail_retina": [
+    "https://raw.githubusercontent.com/z0gg/IDNNOVLogAgent/19884a6351b23459b8a8a4316e1dfbadb891eb29/spk/PACKAGE_ICON_256.PNG",
+    "https://raw.githubusercontent.com/z0gg/IDNNOVLogAgent/19884a6351b23459b8a8a4316e1dfbadb891eb29/spk/PACKAGE_ICON_256.PNG"
+   ]
+  }
+ ]
 }
