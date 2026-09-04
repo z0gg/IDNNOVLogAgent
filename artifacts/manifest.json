@@ -1,11 +1,6 @@
 [
   {
     "mode": "0o755",
-    "path": "bin/api.cgi",
-    "size": 1028
-  },
-  {
-    "mode": "0o755",
     "path": "bin/fluent-bit",
     "size": 7047008
   },
@@ -68,65 +63,5 @@
     "mode": "0o755",
     "path": "scripts/service-setup",
     "size": 1656
-  },
-  {
-    "mode": "0o755",
-    "path": "ui/api.cgi",
-    "size": 1028
-  },
-  {
-    "mode": "0o644",
-    "path": "ui/config",
-    "size": 238
-  },
-  {
-    "mode": "0o644",
-    "path": "ui/config.define",
-    "size": 123
-  },
-  {
-    "mode": "0o644",
-    "path": "ui/help/helptoc.conf",
-    "size": 93
-  },
-  {
-    "mode": "0o644",
-    "path": "ui/help/index.html",
-    "size": 1786
-  },
-  {
-    "mode": "0o644",
-    "path": "ui/images/icon-256.png",
-    "size": 40212
-  },
-  {
-    "mode": "0o644",
-    "path": "ui/images/icon-256.svg",
-    "size": 350
-  },
-  {
-    "mode": "0o644",
-    "path": "ui/images/icon-64.png",
-    "size": 5132
-  },
-  {
-    "mode": "0o644",
-    "path": "ui/images/icon-64.svg",
-    "size": 348
-  },
-  {
-    "mode": "0o644",
-    "path": "ui/index.html",
-    "size": 3486
-  },
-  {
-    "mode": "0o755",
-    "path": "ui/scripts/app.js",
-    "size": 3562
-  },
-  {
-    "mode": "0o644",
-    "path": "ui/styles/app.css",
-    "size": 586
   }
 ]

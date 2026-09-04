@@ -3,7 +3,7 @@
 import argparse, gzip, hashlib, json, os, shutil, stat, tarfile, tempfile
 from pathlib import Path
 
-ROOT=Path(__file__).resolve().parents[1]; EPOCH=int(os.environ.get("SOURCE_DATE_EPOCH","1788230400")); NAME="IDNNOVLogAgent-1.1.8-1025-x86_64.spk"
+ROOT=Path(__file__).resolve().parents[1]; EPOCH=int(os.environ.get("SOURCE_DATE_EPOCH","1788230400")); NAME="IDNNOVLogAgent-1.1.9-1026-x86_64.spk"
 def normalize(root):
     for p in sorted(root.rglob('*')):
         os.utime(p,(EPOCH,EPOCH),follow_symlinks=False)
@@ -23,7 +23,6 @@ def build(binary):
         stage=Path(td); payload=stage/'payload'; outer=stage/'outer'; shutil.copytree(ROOT/'pkgroot',payload); shutil.copytree(ROOT/'spk',outer)
         shutil.rmtree(payload/'lib/idnnov_agent/__pycache__',ignore_errors=True)
         shutil.copytree(ROOT/'src/idnnov_agent',payload/'lib/idnnov_agent',ignore=shutil.ignore_patterns('__pycache__')); shutil.copy2(binary,payload/'bin/fluent-bit'); (payload/'scripts').mkdir(parents=True,exist_ok=True); shutil.copy2(ROOT/'spk/scripts/service-setup',payload/'scripts/service-setup')
-        shutil.copy2(payload/'bin/api.cgi',payload/'ui/api.cgi')
         normalize(payload); normalize(outer)
         package=outer/'package.tgz'
         with package.open('wb') as raw, gzip.GzipFile(filename='',mode='wb',fileobj=raw,mtime=EPOCH,compresslevel=9) as gz, tarfile.open(fileobj=gz,mode='w',format=tarfile.GNU_FORMAT) as tf: add_tree(tf,payload)

@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 class PackageTests(unittest.TestCase):
-    SPK = Path("artifacts/IDNNOVLogAgent-1.1.8-1025-x86_64.spk")
+    SPK = Path("artifacts/IDNNOVLogAgent-1.1.9-1026-x86_64.spk")
 
     def test_info_declares_conf_folder_support_and_package_checksum(self):
         import hashlib, tarfile
@@ -32,7 +32,7 @@ class PackageTests(unittest.TestCase):
         self.assertNotIn("adminport=", info)
         self.assertNotIn("adminprotocol=", info)
         self.assertNotIn("adminurl=", info)
-        self.assertIn('dsmappname="com.idnnov.packages.IDNNOVLogAgent"', info)
+        self.assertNotIn("dsmappname=", info)
 
     def test_no_pycache_in_payload(self):
         import tarfile
@@ -66,11 +66,10 @@ class PackageTests(unittest.TestCase):
         import tarfile
         with tarfile.open(self.SPK) as tf:
             postinst = tf.extractfile("scripts/postinst").read().decode()
-            with tarfile.open(fileobj=tf.extractfile("package.tgz"), mode="r:gz") as pt:
-                api = pt.extractfile("bin/api.cgi").read().decode()
-        for script in (postinst, api):
-            self.assertNotIn('PY="$(' , script)
-            self.assertIn('/bin/py" -m idnnov_agent.', script)
+        # 1.1.9-1026: no desktop application — the CGI wrapper is gone; postinst
+        # still runs the agent python finder directly.
+        self.assertNotIn('PY="$((', postinst)
+        self.assertIn('/bin/py" -m idnnov_agent.', postinst)
 
     def test_parser_config_and_persistent_service_log_are_shipped(self):
         import tarfile
@@ -91,12 +90,13 @@ class PackageTests(unittest.TestCase):
         self.assertTrue(self.SPK.is_file())
         with tarfile.open(self.SPK) as outer:
             info = outer.extractfile("INFO").read().decode()
-            self.assertIn('version="1.1.8-1025"', info)
+            self.assertIn('version="1.1.9-1026"', info)
             self.assertIn('os_min_ver="7.2-72806"', info)
             for arch in ("r1000", "r1000nk", "v1000", "v1000nk", "geminilake", "apollolake", "epyc7002"):
                 self.assertIn(arch, info)
-            self.assertIn('dsmuidir="ui"', info)
-            self.assertIn('dsmappname="com.idnnov.packages.IDNNOVLogAgent"', info)
+            # 1.1.9-1026: no desktop application — install wizard only
+            self.assertNotIn('dsmuidir=', info)
+            self.assertNotIn('dsmappname=', info)
 
     def test_dsm7_required_outer_files_exist(self):
         with tarfile.open(self.SPK) as outer:
