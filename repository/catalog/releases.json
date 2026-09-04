@@ -2,10 +2,10 @@
  "packages": [
   {
    "package": "IDNNOVLogAgent",
-   "version": "1.1.8-1024",
+   "version": "1.1.8-1025",
    "dname": "IDNNOV Log Agent",
    "desc": "Receives local RFC5424 syslog and forwards it to OpenObserve with company and NAS metadata.",
-   "changelog": "The app now tests the OpenObserve connection automatically when opened: the status line shows the live result (HTTP 200 OK in green, or the failure code in red). No button click needed. The manual test button is unchanged and now also shows the HTTP status.",
+   "changelog": "Fixes package app registration: menu icon was missing and Package Center showed no Open button (DSM 7 expects ui/config and the app key must match dsmappname). Also carries 1024: the app now tests the OpenObserve connection automatically when opened and shows the live result (HTTP 200 OK or failure code).",
    "arches": [
     "apollolake",
     "avoton",
@@ -31,10 +31,10 @@
    ],
    "min_build": 72806,
    "max_build": 99999,
-   "url": "https://github.com/z0gg/IDNNOVLogAgent/releases/download/v1.1.8-1024/IDNNOVLogAgent-1.1.8-1024-x86_64.spk",
+   "url": "https://github.com/z0gg/IDNNOVLogAgent/releases/download/v1.1.8-1025/IDNNOVLogAgent-1.1.8-1025-x86_64.spk",
    "size": 3112960,
-   "md5": "e3fb12e9107dd8ab846150f169e70d81",
-   "sha256": "6cc188f2ef4470284a430fe944db1a542a16468f8cfbe7d7e1d96a76fab1280b",
+   "md5": "d85145d8be3a0f5bdc3a576c01d5b820",
+   "sha256": "1deaffb5518caa7e495c00ad57284008d494dc9424d7345984814e7bf5183d3b",
    "thumbnail": [
     "https://raw.githubusercontent.com/z0gg/IDNNOVLogAgent/19884a6351b23459b8a8a4316e1dfbadb891eb29/spk/PACKAGE_ICON.PNG",
     "https://raw.githubusercontent.com/z0gg/IDNNOVLogAgent/19884a6351b23459b8a8a4316e1dfbadb891eb29/spk/PACKAGE_ICON_256.PNG"
