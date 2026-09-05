@@ -3,7 +3,7 @@
 import argparse, gzip, hashlib, json, os, shutil, stat, tarfile, tempfile
 from pathlib import Path
 
-ROOT=Path(__file__).resolve().parents[1]; EPOCH=int(os.environ.get("SOURCE_DATE_EPOCH","1788230400")); NAME="IDNNOVLogAgent-1.1.9-1026-x86_64.spk"
+ROOT=Path(__file__).resolve().parents[1]; EPOCH=int(os.environ.get("SOURCE_DATE_EPOCH","1788230400")); NAME="IDNNOVLogAgent-1.1.10-1027-x86_64.spk"
 def normalize(root):
     for p in sorted(root.rglob('*')):
         os.utime(p,(EPOCH,EPOCH),follow_symlinks=False)

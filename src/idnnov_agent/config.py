@@ -135,7 +135,7 @@ def validate_settings(settings):
     return clean
 
 
-def render_fluent_bit(settings, password, storage_path, parsers_file):
+def render_fluent_bit(settings, password, storage_path, parsers_file, lua_script=None):
     clean = validate_settings(settings)
     origin = urlsplit(clean["collector_url"])
     port = origin.port or 443
@@ -148,4 +148,15 @@ def render_fluent_bit(settings, password, storage_path, parsers_file):
     elif clean["ingest_user"]:
         raise ValueError("ingestion password required")
     company = clean["company_name"] or clean["organization"]
-    return f"""[SERVICE]\n    Flush 5\n    Log_Level info\n    Parsers_File {parsers_file}\n    storage.path {storage_path}\n    storage.sync normal\n    storage.checksum on\n\n[INPUT]\n    Name syslog\n    Mode tcp\n    Listen 127.0.0.1\n    Port 5514\n    # DSM Log Center uses RFC 6587 octet-counting framing over TCP.\n    Format octet_counting\n    Parser syslog-rfc5424\n    storage.type filesystem\n\n[FILTER]\n    Name record_modifier\n    Match *\n    Record idnnov_company {company}\n    Record idnnov_nas {clean['nas_name']}\n    Record idnnov_device_id {clean['device_id']}\n\n[OUTPUT]\n    Name http\n    Match *\n    Host {origin.hostname}\n    Port {port}\n    URI {openobserve_endpoint(clean['organization'], clean['stream'])}\n    Format json\n    Json_date_key _timestamp\n    Json_date_format iso8601\n    tls On\n    tls.verify On\n    compress gzip\n{auth}    storage.total_limit_size 128M\n"""
+    # 1.1.10-1027: lua filter explodes DSM SD-PARAMS ([synolog@6574 k="v" ...])
+    # into indexed fields (event, ip, username, luser, fname, fsize...) and
+    # derives `severity` from `pri`. Optional only for unit tests of the
+    # renderer; production always passes the shipped script.
+    lua_filter = ""
+    if lua_script:
+        lua_filter = (
+            f"\n[FILTER]\n    Name lua\n    Match *\n"
+            f"    script {lua_script}\n    call cb_synology_extract\n"
+            f"    protected_mode true\n"
+        )
+    return f"""[SERVICE]\n    Flush 5\n    Log_Level info\n    Parsers_File {parsers_file}\n    storage.path {storage_path}\n    storage.sync normal\n    storage.checksum on\n\n[INPUT]\n    Name syslog\n    Mode tcp\n    Listen 127.0.0.1\n    Port 5514\n    # DSM Log Center uses RFC 6587 octet-counting framing over TCP.\n    Format octet_counting\n    Parser syslog-rfc5424\n    storage.type filesystem\n\n[FILTER]\n    Name record_modifier\n    Match *\n    Record idnnov_company {company}\n    Record idnnov_nas {clean['nas_name']}\n    Record idnnov_device_id {clean['device_id']}\n{lua_filter}\n[OUTPUT]\n    Name http\n    Match *\n    Host {origin.hostname}\n    Port {port}\n    URI {openobserve_endpoint(clean['organization'], clean['stream'])}\n    Format json\n    Json_date_key _timestamp\n    Json_date_format iso8601\n    tls On\n    tls.verify On\n    compress gzip\n{auth}    storage.total_limit_size 128M\n"""

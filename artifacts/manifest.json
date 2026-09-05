@@ -2,7 +2,7 @@
   {
     "mode": "0o755",
     "path": "bin/fluent-bit",
-    "size": 7047008
+    "size": 7613320
   },
   {
     "mode": "0o755",
@@ -16,18 +16,23 @@
   },
   {
     "mode": "0o644",
+    "path": "etc/synology-extract.lua",
+    "size": 3439
+  },
+  {
+    "mode": "0o644",
     "path": "lib/idnnov_agent/__init__.py",
     "size": 40
   },
   {
     "mode": "0o644",
     "path": "lib/idnnov_agent/api.py",
-    "size": 6631
+    "size": 6632
   },
   {
     "mode": "0o644",
     "path": "lib/idnnov_agent/bootstrap.py",
-    "size": 1068
+    "size": 1107
   },
   {
     "mode": "0o644",
@@ -37,7 +42,7 @@
   {
     "mode": "0o644",
     "path": "lib/idnnov_agent/config.py",
-    "size": 6416
+    "size": 6974
   },
   {
     "mode": "0o644",

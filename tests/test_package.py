@@ -5,7 +5,8 @@ from pathlib import Path
 
 
 class PackageTests(unittest.TestCase):
-    SPK = Path("artifacts/IDNNOVLogAgent-1.1.9-1026-x86_64.spk")
+    SPK = Path("artifacts/IDNNOVLogAgent-1.1.10-1027-x86_64.spk")
+    ROOT = Path(__file__).resolve().parents[1]
 
     def test_info_declares_conf_folder_support_and_package_checksum(self):
         import hashlib, tarfile
@@ -86,11 +87,46 @@ class PackageTests(unittest.TestCase):
         self.assertIn('fluent-bit.log', service)
         self.assertNotIn('>/dev/null 2>&1', service)
 
+    def test_lua_sdparams_extraction_shipped_and_wired(self):
+        """Regression lock (1.1.10-1027): SD-PARAMS explosion + severity."""
+        import tarfile
+        with tarfile.open(self.SPK) as tf, tarfile.open(fileobj=tf.extractfile("package.tgz"), mode="r:gz") as pt:
+            lua = pt.extractfile("etc/synology-extract.lua").read().decode()
+            # bootstrap generates the fluent-bit.conf; check renderer wiring in src
+            bootstrap = pt.extractfile("lib/idnnov_agent/bootstrap.py").read().decode()
+        # severity must be derived with modulo (pri % 8), never division.
+        self.assertIn('SEV_NAMES[n % 8]', lua)
+        # PCRE-only patterns are invalid in native Lua patterns: they silently
+        # match nothing (bench-proven: gmatch returned 0 pairs). Lock pure-Lua:
+        # no non-capturing groups outside a comment.
+        code_only = "\n".join(l for l in lua.splitlines() if not l.strip().startswith("--"))
+        self.assertNotIn("?:", code_only)
+        self.assertIn('gmatch(\'([%w_]+)="([^"]*)"\')', lua)
+        # sequenceId must never be indexed as a field.
+        self.assertIn('~= "sequenceId"', lua)
+        # renderer passes the lua script to render_fluent_bit.
+        self.assertIn("synology-extract.lua", bootstrap)
+
+    def test_rendered_config_contains_lua_filter(self):
+        import sys
+        sys.path.insert(0, str(self.ROOT / "src"))
+        from idnnov_agent.config import render_fluent_bit
+        conf = render_fluent_bit(
+            {"collector_url": "https://logs.example.com", "organization": "org1",
+             "company_name": "Acme", "stream": "synology_logs", "nas_name": "nas1",
+             "device_id": "d1", "ingest_user": "u1"},
+            "x" * 32, "/tmp/buf", "/tmp/parsers.conf",
+            lua_script="/pkg/etc/synology-extract.lua")
+        self.assertIn("Name lua", conf)
+        self.assertIn("script /pkg/etc/synology-extract.lua", conf)
+        self.assertIn("call cb_synology_extract", conf)
+        self.assertIn("protected_mode true", conf)
+
     def test_required_dsm_metadata_and_ui(self):
         self.assertTrue(self.SPK.is_file())
         with tarfile.open(self.SPK) as outer:
             info = outer.extractfile("INFO").read().decode()
-            self.assertIn('version="1.1.9-1026"', info)
+            self.assertIn('version="1.1.10-1027"', info)
             self.assertIn('os_min_ver="7.2-72806"', info)
             for arch in ("r1000", "r1000nk", "v1000", "v1000nk", "geminilake", "apollolake", "epyc7002"):
                 self.assertIn(arch, info)

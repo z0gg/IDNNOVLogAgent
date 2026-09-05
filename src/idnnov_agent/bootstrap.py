@@ -17,7 +17,7 @@ def main():
     # stored token; strip it before validation and rendering.
     password = (etc / "token").read_text().strip() if settings["ingest_user"] and (etc / "token").is_file() else None
     candidate = etc / "fluent-bit.conf.tmp"
-    candidate.write_text(render_fluent_bit(settings, password, str(root / "buffer"), str(pkg / "etc/parsers.conf")))
+    candidate.write_text(render_fluent_bit(settings, password, str(root / "buffer"), str(pkg / "etc/parsers.conf"), str(pkg / "etc/synology-extract.lua")))
     candidate.chmod(0o600)
     os.replace(candidate, etc / "fluent-bit.conf")
 
