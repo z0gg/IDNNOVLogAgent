@@ -2,10 +2,10 @@
  "packages": [
   {
    "package": "IDNNOVLogAgent",
-   "version": "1.1.9-1026",
+   "version": "1.1.10-1027",
    "dname": "IDNNOV Log Agent",
    "desc": "Receives local RFC5424 syslog and forwards it to OpenObserve with company and NAS metadata.",
-   "changelog": "Simplified: the desktop application is removed. The install wizard (OpenObserve URL, organization, company, stream, NAS name, ingest credentials) is the only interface; afterwards the agent runs unattended. Carries all prior fixes (timezone, token handling).",
+   "changelog": "Les champs structurés DSM sont éclatés en champs indexés (event, ip, username, luser, fname, fsize, isdir, event_id, synotype) + champ severity dérivé de pri (RFC 5424). Message nettoyé. Requêtes SQL réelles par client désormais possibles.",
    "arches": [
     "apollolake",
     "avoton",
@@ -31,10 +31,10 @@
    ],
    "min_build": 72806,
    "max_build": 99999,
-   "url": "https://github.com/z0gg/IDNNOVLogAgent/releases/download/v1.1.9-1026/IDNNOVLogAgent-1.1.9-1026-x86_64.spk",
-   "size": 3051520,
-   "md5": "c9f2598bcba26f04240cfd1d06f21548",
-   "sha256": "e4d0e6cbf17b9ef9b836c8517da4c9f2d520b77ed25b5b4856e46152eafc1541",
+   "url": "https://github.com/z0gg/IDNNOVLogAgent/releases/download/v1.1.10-1027/IDNNOVLogAgent-1.1.10-1027-x86_64.spk",
+   "size": 3348480,
+   "md5": "fb6d9fa06da12e572b442cc966c12f14",
+   "sha256": "12094b8255d7b352a506bdeca65e641191e39118ea1392ac313ea106a035f7f4",
    "thumbnail": [
     "https://raw.githubusercontent.com/z0gg/IDNNOVLogAgent/19884a6351b23459b8a8a4316e1dfbadb891eb29/spk/PACKAGE_ICON.PNG",
     "https://raw.githubusercontent.com/z0gg/IDNNOVLogAgent/19884a6351b23459b8a8a4316e1dfbadb891eb29/spk/PACKAGE_ICON_256.PNG"
